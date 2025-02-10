@@ -81,6 +81,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "wakaama_logger.h"  // Include the header file for our logger
+
 #define MAX_PACKET_SIZE 2048
 #define DEFAULT_SERVER_IPV6 "[::1]"
 #define DEFAULT_SERVER_IPV4 "127.0.0.1"

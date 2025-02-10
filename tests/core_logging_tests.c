@@ -26,6 +26,13 @@
 
 #ifndef LWM2M_LOG_CUSTOM_HANDLER
 #error These tests expect to use a custom logging handler to capture the log messages!
+void lwm2m_custom_log_handler(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+}
+lwm2m_set_logger(lwm2m_custom_log_handler);
 #endif
 
 static void setup(void) { test_log_handler_clear_captured_message(); }
