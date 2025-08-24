@@ -91,6 +91,7 @@ void signalk_notify_if_changed(const char *path, const char *new_value) {
             if (strcmp(observed_paths[i].value, new_value) != 0) {
                 strncpy(observed_paths[i].value, new_value, sizeof(observed_paths[i].value) - 1);
                 // TODO: Trigger LwM2M notification for this resource
+                // TODO: Integrate with LwM2M observe callback to send notification
                 printf("Value changed for %s: %s\n", path, new_value);
             }
             return;

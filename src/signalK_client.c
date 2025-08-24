@@ -20,7 +20,8 @@ static int callback_signalk(struct lws *wsi, enum lws_callback_reasons reason,
             break;
         case LWS_CALLBACK_CLIENT_RECEIVE:
             printf("Received: %.*s\n", (int)len, (char *)in);
-            // Example: parse JSON and update value cache
+            // TODO: Parse JSON and update value cache
+            // TODO: Integrate with LwM2M resource update logic
             // cJSON *json = cJSON_Parse((char *)in);
             // if (json) { /* parse and update cache */ cJSON_Delete(json); }
             break;
@@ -78,7 +79,7 @@ int main(void) {
         return 1;
     }
 
-    // Example: simulate observe start/stop
+    // TODO: Simulate observe start/stop for testing
     // signalk_observe_start("navigation.position");
     // signalk_observe_stop("navigation.position");
 
