@@ -2,6 +2,9 @@
 #include <libwebsockets.h>
 #include <string.h>
 #include <stdio.h>
+
+#include "signalK_observe.h"
+#include <cjson/cJSON.h>
 #include <stdlib.h>
 
 #define SIGNALK_WS_URL "ws://localhost:3000/signalk/v1/stream"
@@ -11,10 +14,15 @@ static int callback_signalk(struct lws *wsi, enum lws_callback_reasons reason,
     switch (reason) {
         case LWS_CALLBACK_CLIENT_ESTABLISHED:
             printf("Connected to SignalK WebSocket!\n");
+            // Subscribe to position and speedOverGround after connection
+            signalk_observe_start(wsi, "navigation.position");
+            signalk_observe_start(wsi, "navigation.speedOverGround");
             break;
         case LWS_CALLBACK_CLIENT_RECEIVE:
             printf("Received: %.*s\n", (int)len, (char *)in);
-            // Here you would parse JSON and process values
+            // Example: parse JSON and update value cache
+            // cJSON *json = cJSON_Parse((char *)in);
+            // if (json) { /* parse and update cache */ cJSON_Delete(json); }
             break;
         case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
             printf("Connection error\n");
@@ -69,6 +77,10 @@ int main(void) {
         lws_context_destroy(context);
         return 1;
     }
+
+    // Example: simulate observe start/stop
+    // signalk_observe_start("navigation.position");
+    // signalk_observe_stop("navigation.position");
 
     while (lws_service(context, 1000) >= 0) {
         // Event loop

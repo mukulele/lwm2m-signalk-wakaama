@@ -137,7 +137,8 @@
 			"language" : "C",
 			"sourceIndexes" : 
 			[
-				0
+				0,
+				1
 			]
 		}
 	],
@@ -163,6 +164,11 @@
 				"backtrace" : 2,
 				"fragment" : "-lcap",
 				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-lcjson",
+				"role" : "libraries"
 			}
 		],
 		"language" : "C"
@@ -180,7 +186,8 @@
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
-				0
+				0,
+				1
 			]
 		}
 	],
@@ -190,6 +197,12 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "src/signalK_client.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/signalK_observe.c",
 			"sourceGroupIndex" : 0
 		}
 	],

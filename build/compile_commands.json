@@ -220,6 +220,11 @@
   "file": "/home/pi/wakaama/src/signalK_client.c"
 },
 {
+  "directory": "/home/pi/wakaama/build",
+  "command": "/usr/bin/cc -DLWM2M_LITTLE_ENDIAN  -g -Waggregate-return -Wall -Wcast-align -Wextra -Wfloat-equal -Wpointer-arith -Wshadow -Wswitch-default -Wwrite-strings -pedantic -Wno-unused-parameter -Wno-uninitialized -Werror -Wno-error=cast-align -o CMakeFiles/signalK_client.dir/src/signalK_observe.c.o -c /home/pi/wakaama/src/signalK_observe.c",
+  "file": "/home/pi/wakaama/src/signalK_observe.c"
+},
+{
   "directory": "/home/pi/wakaama/build/tests",
   "command": "/usr/bin/cc -DLWM2M_BOOTSTRAP_SERVER_MODE -DLWM2M_CLIENT_MODE -DLWM2M_COAP_DEFAULT_BLOCK_SIZE=1024 -DLWM2M_LITTLE_ENDIAN -DLWM2M_LOG_LEVEL=LWM2M_LOG_DISABLED -DLWM2M_LOG_MAX_MSG_TXT_SIZE=200 -DLWM2M_OLD_CONTENT_FORMAT_SUPPORT -DLWM2M_SERVER_MODE -DLWM2M_SUPPORT_JSON -DLWM2M_SUPPORT_SENML_CBOR -DLWM2M_SUPPORT_SENML_JSON -DLWM2M_SUPPORT_TLV -D_POSIX_C_SOURCE=200809 -I/home/pi/wakaama/include -I/home/pi/wakaama/core -I/home/pi/wakaama/coap -I/home/pi/wakaama/examples/shared -I/home/pi/wakaama/tests/helper -g -Waggregate-return -Wall -Wcast-align -Wextra -Wfloat-equal -Wpointer-arith -Wshadow -Wswitch-default -Wwrite-strings -pedantic -Wno-unused-parameter -Wno-uninitialized -Werror -Wno-error=cast-align -o CMakeFiles/lwm2munittests.dir/helper/log_handler.c.o -c /home/pi/wakaama/tests/helper/log_handler.c",
   "file": "/home/pi/wakaama/tests/helper/log_handler.c"
