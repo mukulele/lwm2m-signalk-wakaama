@@ -1,0 +1,156 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.21"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7
+					]
+				},
+				{
+					"build" : "tests",
+					"jsonFile" : "directory-tests-Debug-b01f6abb0ab61427ef3b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.21"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "tests",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "wakaama",
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "lwm2munittests",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "lwm2munittests::@a44f0ac069e85531cdee",
+					"jsonFile" : "target-lwm2munittests-Debug-c36f3293138a32c98577.json",
+					"name" : "lwm2munittests",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "signalK_client::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-signalK_client-Debug-ad31e301d1cad2b8b135.json",
+					"name" : "signalK_client",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "wakaama_command_line::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-wakaama_command_line-Debug-485c47cb527dee1493da.json",
+					"name" : "wakaama_command_line",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "wakaama_platform_posix::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-wakaama_platform_posix-Debug-eaefe082297669ecda52.json",
+					"name" : "wakaama_platform_posix",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "wakaama_static::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-wakaama_static-Debug-8782a09e5ed08769391c.json",
+					"name" : "wakaama_static",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "wakaama_transport_posix_udp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-wakaama_transport_posix_udp-Debug-522f02242c76f3cb0e44.json",
+					"name" : "wakaama_transport_posix_udp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "wakaama_transport_testing_fake::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-wakaama_transport_testing_fake-Debug-70151fab90724e08eebb.json",
+					"name" : "wakaama_transport_testing_fake",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "wakaama_transport_tinydtls::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-wakaama_transport_tinydtls-Debug-20e43f33cb66dbe0733f.json",
+					"name" : "wakaama_transport_tinydtls",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/pi/wakaama/build",
+		"source" : "/home/pi/wakaama"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

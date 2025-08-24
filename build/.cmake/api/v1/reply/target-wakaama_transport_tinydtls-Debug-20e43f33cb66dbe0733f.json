@@ -1,0 +1,452 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/connection.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/dtls.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/crypto.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/ccm.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/hmac.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/dtls_debug.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/netq.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/peer.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/dtls_prng.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/dtls_time.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/session.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/aes/rijndael.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/aes/rijndael_wrap.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/sha2/sha2.c.o"
+		},
+		{
+			"path" : "CMakeFiles/wakaama_transport_tinydtls.dir/transport/tinydtls/third_party/tinydtls/ecc/ecc.c.o"
+		}
+	],
+	"backtrace" : 3,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"include",
+			"target_link_libraries",
+			"add_compile_definitions",
+			"target_compile_definitions",
+			"target_sources_tinydtls",
+			"target_include_directories",
+			"target_sources"
+		],
+		"files" : 
+		[
+			"wakaama.cmake",
+			"CMakeLists.txt",
+			"transport/tinydtls/tinydtls.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 5,
+				"parent" : 0
+			},
+			{
+				"file" : 0,
+				"parent" : 1
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 272,
+				"parent" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 282,
+				"parent" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 88,
+				"parent" : 2
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 281,
+				"parent" : 2
+			},
+			{
+				"command" : 4,
+				"file" : 2,
+				"line" : 69,
+				"parent" : 6
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 275,
+				"parent" : 2
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 283,
+				"parent" : 2
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 276,
+				"parent" : 2
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 280,
+				"parent" : 2
+			},
+			{
+				"command" : 6,
+				"file" : 2,
+				"line" : 70,
+				"parent" : 6
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 274,
+				"parent" : 2
+			},
+			{
+				"command" : 7,
+				"file" : 2,
+				"line" : 67,
+				"parent" : 6
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 5,
+					"define" : "LWM2M_LITTLE_ENDIAN"
+				},
+				{
+					"backtrace" : 7,
+					"define" : "SHA2_USE_INTTYPES_H"
+				},
+				{
+					"backtrace" : 7,
+					"define" : "WITH_SHA256"
+				},
+				{
+					"backtrace" : 8,
+					"define" : "WITH_TINYDTLS"
+				},
+				{
+					"backtrace" : 9,
+					"define" : "_POSIX_C_SOURCE=200809"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 10,
+					"path" : "/home/pi/wakaama/transport/tinydtls/include"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "/home/pi/wakaama/transport/tinydtls/third_party"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "/home/pi/wakaama/include"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "/home/pi/wakaama/transport/tinydtls/third_party/tinydtls"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/pi/wakaama/examples/shared"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g"
+				},
+				{
+					"fragment" : "-Wno-cast-align"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 5,
+					"define" : "LWM2M_LITTLE_ENDIAN"
+				},
+				{
+					"backtrace" : 7,
+					"define" : "SHA2_USE_INTTYPES_H"
+				},
+				{
+					"backtrace" : 7,
+					"define" : "WITH_SHA256"
+				},
+				{
+					"backtrace" : 8,
+					"define" : "WITH_TINYDTLS"
+				},
+				{
+					"backtrace" : 9,
+					"define" : "_POSIX_C_SOURCE=200809"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 10,
+					"path" : "/home/pi/wakaama/transport/tinydtls/include"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "/home/pi/wakaama/transport/tinydtls/third_party"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "/home/pi/wakaama/include"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "/home/pi/wakaama/transport/tinydtls/third_party/tinydtls"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/pi/wakaama/examples/shared"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 4,
+			"id" : "wakaama_command_line::@6890427a1f51a3e7e1df"
+		}
+	],
+	"id" : "wakaama_transport_tinydtls::@6890427a1f51a3e7e1df",
+	"name" : "wakaama_transport_tinydtls",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				17
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 13,
+			"compileGroupIndex" : 0,
+			"path" : "transport/tinydtls/connection.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"path" : "transport/tinydtls/third_party/tinydtls/tinydtls.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 14,
+			"path" : "transport/tinydtls/third_party/tinydtls/dtls.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/dtls.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/crypto.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/ccm.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/hmac.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/dtls_debug.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/netq.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/peer.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/dtls_prng.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/dtls_time.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/session.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/aes/rijndael.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/aes/rijndael_wrap.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/sha2/sha2.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"compileGroupIndex" : 1,
+			"path" : "transport/tinydtls/third_party/tinydtls/ecc/ecc.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 14,
+			"path" : "transport/tinydtls/third_party/tinydtls/dtls_config.h",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "OBJECT_LIBRARY"
+}
