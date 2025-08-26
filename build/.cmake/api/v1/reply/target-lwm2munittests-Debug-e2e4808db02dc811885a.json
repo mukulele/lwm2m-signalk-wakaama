@@ -14,6 +14,7 @@
 			"set_property",
 			"_pkg_create_imp_target",
 			"_pkg_recalculate",
+			"_pkg_check_modules_internal",
 			"pkg_search_module",
 			"target_link_libraries",
 			"add_compile_options",
@@ -50,31 +51,37 @@
 				"parent" : 0
 			},
 			{
-				"command" : 4,
+				"command" : 5,
 				"file" : 0,
 				"line" : 35,
 				"parent" : 0
 			},
 			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 883,
+				"parent" : 2
+			},
+			{
 				"command" : 3,
 				"file" : 1,
-				"line" : 900,
-				"parent" : 2
+				"line" : 657,
+				"parent" : 3
 			},
 			{
 				"command" : 2,
 				"file" : 1,
 				"line" : 339,
-				"parent" : 3
+				"parent" : 4
 			},
 			{
 				"command" : 1,
 				"file" : 1,
 				"line" : 320,
-				"parent" : 4
+				"parent" : 5
 			},
 			{
-				"command" : 5,
+				"command" : 6,
 				"file" : 0,
 				"line" : 43,
 				"parent" : 0
@@ -83,188 +90,188 @@
 				"file" : 3
 			},
 			{
-				"command" : 7,
+				"command" : 8,
 				"file" : 3,
 				"line" : 5,
-				"parent" : 7
-			},
-			{
-				"file" : 2,
 				"parent" : 8
 			},
 			{
-				"command" : 6,
 				"file" : 2,
-				"line" : 314,
 				"parent" : 9
 			},
 			{
-				"command" : 10,
+				"command" : 7,
+				"file" : 2,
+				"line" : 314,
+				"parent" : 10
+			},
+			{
+				"command" : 11,
 				"file" : 0,
 				"line" : 31,
 				"parent" : 0
 			},
 			{
-				"command" : 9,
+				"command" : 10,
 				"file" : 2,
 				"line" : 163,
-				"parent" : 11
+				"parent" : 12
 			},
 			{
-				"command" : 8,
+				"command" : 9,
 				"file" : 2,
 				"line" : 103,
-				"parent" : 12
+				"parent" : 13
 			},
 			{
-				"command" : 8,
+				"command" : 9,
 				"file" : 2,
 				"line" : 97,
-				"parent" : 12
-			},
-			{
-				"command" : 11,
-				"file" : 2,
-				"line" : 165,
-				"parent" : 11
-			},
-			{
-				"command" : 8,
-				"file" : 2,
-				"line" : 146,
-				"parent" : 15
+				"parent" : 13
 			},
 			{
 				"command" : 12,
 				"file" : 2,
-				"line" : 88,
-				"parent" : 9
+				"line" : 165,
+				"parent" : 12
+			},
+			{
+				"command" : 9,
+				"file" : 2,
+				"line" : 146,
+				"parent" : 16
 			},
 			{
 				"command" : 13,
 				"file" : 2,
-				"line" : 167,
-				"parent" : 11
-			},
-			{
-				"command" : 8,
-				"file" : 2,
-				"line" : 152,
-				"parent" : 18
-			},
-			{
-				"command" : 8,
-				"file" : 2,
-				"line" : 158,
-				"parent" : 18
+				"line" : 88,
+				"parent" : 10
 			},
 			{
 				"command" : 14,
 				"file" : 2,
-				"line" : 166,
-				"parent" : 11
-			},
-			{
-				"command" : 8,
-				"file" : 2,
-				"line" : 136,
-				"parent" : 21
-			},
-			{
-				"command" : 8,
-				"file" : 2,
-				"line" : 100,
+				"line" : 167,
 				"parent" : 12
 			},
 			{
-				"command" : 8,
+				"command" : 9,
+				"file" : 2,
+				"line" : 152,
+				"parent" : 19
+			},
+			{
+				"command" : 9,
+				"file" : 2,
+				"line" : 158,
+				"parent" : 19
+			},
+			{
+				"command" : 15,
+				"file" : 2,
+				"line" : 166,
+				"parent" : 12
+			},
+			{
+				"command" : 9,
+				"file" : 2,
+				"line" : 136,
+				"parent" : 22
+			},
+			{
+				"command" : 9,
+				"file" : 2,
+				"line" : 100,
+				"parent" : 13
+			},
+			{
+				"command" : 9,
 				"file" : 2,
 				"line" : 124,
-				"parent" : 21
+				"parent" : 22
 			},
 			{
-				"command" : 8,
+				"command" : 9,
 				"file" : 2,
 				"line" : 130,
-				"parent" : 21
+				"parent" : 22
 			},
 			{
-				"command" : 8,
+				"command" : 9,
 				"file" : 2,
 				"line" : 127,
-				"parent" : 21
+				"parent" : 22
 			},
 			{
-				"command" : 8,
+				"command" : 9,
 				"file" : 2,
 				"line" : 121,
-				"parent" : 21
+				"parent" : 22
 			},
 			{
-				"command" : 8,
+				"command" : 9,
 				"file" : 0,
 				"line" : 39,
 				"parent" : 0
 			},
 			{
-				"command" : 16,
+				"command" : 17,
 				"file" : 0,
 				"line" : 41,
 				"parent" : 0
 			},
 			{
-				"command" : 15,
+				"command" : 16,
 				"file" : 2,
 				"line" : 225,
-				"parent" : 29
+				"parent" : 30
 			},
 			{
-				"command" : 15,
+				"command" : 16,
 				"file" : 2,
 				"line" : 228,
-				"parent" : 29
-			},
-			{
-				"command" : 17,
-				"file" : 2,
-				"line" : 247,
-				"parent" : 29
-			},
-			{
-				"command" : 15,
-				"file" : 2,
-				"line" : 197,
-				"parent" : 32
+				"parent" : 30
 			},
 			{
 				"command" : 18,
+				"file" : 2,
+				"line" : 247,
+				"parent" : 30
+			},
+			{
+				"command" : 16,
+				"file" : 2,
+				"line" : 197,
+				"parent" : 33
+			},
+			{
+				"command" : 19,
 				"file" : 0,
 				"line" : 29,
 				"parent" : 0
 			},
 			{
-				"command" : 18,
+				"command" : 19,
 				"file" : 2,
 				"line" : 207,
-				"parent" : 29
-			},
-			{
-				"command" : 18,
-				"file" : 2,
-				"line" : 191,
-				"parent" : 32
+				"parent" : 30
 			},
 			{
 				"command" : 19,
 				"file" : 2,
-				"line" : 248,
-				"parent" : 29
+				"line" : 191,
+				"parent" : 33
 			},
 			{
-				"command" : 18,
+				"command" : 20,
+				"file" : 2,
+				"line" : 248,
+				"parent" : 30
+			},
+			{
+				"command" : 19,
 				"file" : 2,
 				"line" : 174,
-				"parent" : 37
+				"parent" : 38
 			}
 		]
 	},
@@ -277,137 +284,137 @@
 					"fragment" : "-g"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Waggregate-return"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wall"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wcast-align"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wextra"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wfloat-equal"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wpointer-arith"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wshadow"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wswitch-default"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wwrite-strings"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-pedantic"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wno-unused-parameter"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wno-uninitialized"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Werror"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 11,
 					"fragment" : "-Wno-error=cast-align"
 				}
 			],
 			"defines" : 
 			[
 				{
-					"backtrace" : 13,
+					"backtrace" : 14,
 					"define" : "LWM2M_BOOTSTRAP_SERVER_MODE"
 				},
 				{
-					"backtrace" : 14,
+					"backtrace" : 15,
 					"define" : "LWM2M_CLIENT_MODE"
 				},
 				{
-					"backtrace" : 16,
+					"backtrace" : 17,
 					"define" : "LWM2M_COAP_DEFAULT_BLOCK_SIZE=1024"
 				},
 				{
-					"backtrace" : 17,
+					"backtrace" : 18,
 					"define" : "LWM2M_LITTLE_ENDIAN"
 				},
 				{
-					"backtrace" : 19,
+					"backtrace" : 20,
 					"define" : "LWM2M_LOG_LEVEL=LWM2M_LOG_DISABLED"
 				},
 				{
-					"backtrace" : 20,
+					"backtrace" : 21,
 					"define" : "LWM2M_LOG_MAX_MSG_TXT_SIZE=200"
 				},
 				{
-					"backtrace" : 22,
+					"backtrace" : 23,
 					"define" : "LWM2M_OLD_CONTENT_FORMAT_SUPPORT"
 				},
 				{
-					"backtrace" : 23,
+					"backtrace" : 24,
 					"define" : "LWM2M_SERVER_MODE"
 				},
 				{
-					"backtrace" : 24,
+					"backtrace" : 25,
 					"define" : "LWM2M_SUPPORT_JSON"
 				},
 				{
-					"backtrace" : 25,
+					"backtrace" : 26,
 					"define" : "LWM2M_SUPPORT_SENML_CBOR"
 				},
 				{
-					"backtrace" : 26,
+					"backtrace" : 27,
 					"define" : "LWM2M_SUPPORT_SENML_JSON"
 				},
 				{
-					"backtrace" : 27,
+					"backtrace" : 28,
 					"define" : "LWM2M_SUPPORT_TLV"
 				},
 				{
-					"backtrace" : 28,
+					"backtrace" : 29,
 					"define" : "_POSIX_C_SOURCE=200809"
 				}
 			],
 			"includes" : 
 			[
 				{
-					"backtrace" : 30,
+					"backtrace" : 31,
 					"path" : "/home/pi/wakaama/include"
 				},
 				{
-					"backtrace" : 31,
+					"backtrace" : 32,
 					"path" : "/home/pi/wakaama/core"
 				},
 				{
-					"backtrace" : 33,
+					"backtrace" : 34,
 					"path" : "/home/pi/wakaama/coap"
 				},
 				{
-					"backtrace" : 6,
+					"backtrace" : 7,
 					"path" : "/home/pi/wakaama/examples/shared"
 				},
 				{
-					"backtrace" : 6,
+					"backtrace" : 7,
 					"path" : "/home/pi/wakaama/tests/helper"
 				}
 			],
@@ -459,15 +466,15 @@
 	"dependencies" : 
 	[
 		{
-			"backtrace" : 6,
+			"backtrace" : 7,
 			"id" : "wakaama_command_line::@6890427a1f51a3e7e1df"
 		},
 		{
-			"backtrace" : 6,
+			"backtrace" : 7,
 			"id" : "wakaama_platform_posix::@6890427a1f51a3e7e1df"
 		},
 		{
-			"backtrace" : 6,
+			"backtrace" : 7,
 			"id" : "wakaama_transport_testing_fake::@6890427a1f51a3e7e1df"
 		}
 	],
@@ -485,7 +492,7 @@
 				"role" : "flags"
 			},
 			{
-				"backtrace" : 5,
+				"backtrace" : 6,
 				"fragment" : "/usr/lib/aarch64-linux-gnu/libcunit.so",
 				"role" : "libraries"
 			}
@@ -567,263 +574,263 @@
 	"sources" : 
 	[
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/helper/log_handler.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/coap_block1tests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/coap_block2tests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/coap_parse_message.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/data_cbor_tests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/core_convert_numbers_test.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/core_list_tests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/core_logging_tests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/core_registration_tests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/core_uritests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/data_senml_cbor_tests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/data_senml_json_tests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/data_tlv_json_lwm2m_data_test.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/data_tlvtests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"path" : "tests/tests.h",
 			"sourceGroupIndex" : 1
 		},
 		{
-			"backtrace" : 34,
+			"backtrace" : 35,
 			"compileGroupIndex" : 0,
 			"path" : "tests/unittests.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/bootstrap.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/discover.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"path" : "core/internals.h",
 			"sourceGroupIndex" : 1
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/liblwm2m.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/list.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/logging.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/management.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/objects.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/observe.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/packet.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/registration.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/uri.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/utils.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 35,
+			"backtrace" : 36,
 			"compileGroupIndex" : 0,
 			"path" : "core/reporting.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 36,
+			"backtrace" : 37,
 			"compileGroupIndex" : 0,
 			"path" : "coap/block.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 36,
+			"backtrace" : 37,
 			"compileGroupIndex" : 0,
 			"path" : "coap/er-coap-13/er-coap-13.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 36,
+			"backtrace" : 37,
 			"compileGroupIndex" : 0,
 			"path" : "coap/transaction.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 38,
+			"backtrace" : 39,
 			"compileGroupIndex" : 0,
 			"path" : "data/data.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 38,
+			"backtrace" : 39,
 			"compileGroupIndex" : 0,
 			"path" : "data/json.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 38,
+			"backtrace" : 39,
 			"compileGroupIndex" : 0,
 			"path" : "data/json_common.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 38,
+			"backtrace" : 39,
 			"compileGroupIndex" : 0,
 			"path" : "data/senml_json.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 38,
+			"backtrace" : 39,
 			"compileGroupIndex" : 0,
 			"path" : "data/tlv.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 38,
+			"backtrace" : 39,
 			"compileGroupIndex" : 0,
 			"path" : "data/cbor.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 38,
+			"backtrace" : 39,
 			"compileGroupIndex" : 0,
 			"path" : "data/senml_common.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 38,
+			"backtrace" : 39,
 			"compileGroupIndex" : 0,
 			"path" : "data/senml_cbor.c",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 6,
+			"backtrace" : 7,
 			"isGenerated" : true,
 			"path" : "build/CMakeFiles/wakaama_command_line.dir/examples/shared/commandline.c.o",
 			"sourceGroupIndex" : 2
 		},
 		{
-			"backtrace" : 6,
+			"backtrace" : 7,
 			"isGenerated" : true,
 			"path" : "build/CMakeFiles/wakaama_platform_posix.dir/examples/shared/platform.c.o",
 			"sourceGroupIndex" : 2
 		},
 		{
-			"backtrace" : 6,
+			"backtrace" : 7,
 			"isGenerated" : true,
 			"path" : "build/CMakeFiles/wakaama_transport_testing_fake.dir/tests/helper/connection.c.o",
 			"sourceGroupIndex" : 2
