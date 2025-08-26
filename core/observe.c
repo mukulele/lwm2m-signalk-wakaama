@@ -53,10 +53,7 @@
 #include <stdio.h>
 
 
-
 #ifdef LWM2M_CLIENT_MODE
-// ...existing code...
-#endif // End of LWM2M_CLIENT_MODE
 static lwm2m_observed_t * prv_findObserved(lwm2m_context_t * contextP,
                                            lwm2m_uri_t * uriP)
 {
@@ -69,7 +66,6 @@ static lwm2m_observed_t * prv_findObserved(lwm2m_context_t * contextP,
          || (LWM2M_URI_IS_SET_RESOURCE(uriP) && targetP->uri.resourceId != uriP->resourceId)
 #ifndef LWM2M_VERSION_1_0
          || (LWM2M_URI_IS_SET_RESOURCE_INSTANCE(uriP) && targetP->uri.resourceInstanceId != uriP->resourceInstanceId)
-
 #endif
            ))
     {
@@ -183,60 +179,21 @@ uint8_t observe_handleRequest(lwm2m_context_t * contextP,
     coap_get_header_observe(message, &count);
 
     switch (count)
-        case 0:
-            if (!LWM2M_URI_IS_SET_INSTANCE(uriP) && LWM2M_URI_IS_SET_RESOURCE(uriP)) return COAP_400_BAD_REQUEST;
-            if (message->token_len == 0) return COAP_400_BAD_REQUEST;
-            watcherP = prv_getWatcher(contextP, uriP, serverP);
-            if (watcherP == NULL) return COAP_500_INTERNAL_SERVER_ERROR;
-            watcherP->tokenLen = message->token_len;
-            memcpy(watcherP->token, message->token, message->token_len);
-            watcherP->active = true;
-            watcherP->lastTime = lwm2m_gettime();
-            watcherP->lastMid = response->mid;
-            watcherP->format = (lwm2m_media_type_t)response->content_type;
-            valueP = dataP;
-            // ...existing code...
-            return COAP_205_CONTENT;
-
-        valueP = dataP;
-#ifndef LWM2M_VERSION_1_0
-        if (LWM2M_URI_IS_SET_RESOURCE_INSTANCE(uriP)
-         && dataP->type == LWM2M_TYPE_MULTIPLE_RESOURCE
-         && dataP->value.asChildren.count == 1)
-        {
-            valueP = dataP->value.asChildren.array;
-        }
-#endif
-        if (LWM2M_URI_IS_SET_RESOURCE(uriP))
-        {
-            switch (valueP->type)
-            {
-            case LWM2M_TYPE_INTEGER:
-                if (1 != lwm2m_data_decode_int(valueP, &(watcherP->lastValue.asInteger))) return COAP_500_INTERNAL_SERVER_ERROR;
-                break;
-            case LWM2M_TYPE_UNSIGNED_INTEGER:
-                if (1 != lwm2m_data_decode_uint(valueP, &(watcherP->lastValue.asUnsigned))) return COAP_500_INTERNAL_SERVER_ERROR;
-                break;
-            case LWM2M_TYPE_FLOAT:
-                if (1 != lwm2m_data_decode_float(valueP, &(watcherP->lastValue.asFloat))) return COAP_500_INTERNAL_SERVER_ERROR;
-                break;
-            default:
-                break;
-            }
-    coap_get_header_observe(message, &count);
-    switch (count)
     {
     case 0:
         if (!LWM2M_URI_IS_SET_INSTANCE(uriP) && LWM2M_URI_IS_SET_RESOURCE(uriP)) return COAP_400_BAD_REQUEST;
         if (message->token_len == 0) return COAP_400_BAD_REQUEST;
+
         watcherP = prv_getWatcher(contextP, uriP, serverP);
         if (watcherP == NULL) return COAP_500_INTERNAL_SERVER_ERROR;
+
         watcherP->tokenLen = message->token_len;
         memcpy(watcherP->token, message->token, message->token_len);
         watcherP->active = true;
         watcherP->lastTime = lwm2m_gettime();
         watcherP->lastMid = response->mid;
         watcherP->format = (lwm2m_media_type_t)response->content_type;
+
         valueP = dataP;
 #ifndef LWM2M_VERSION_1_0
         if (LWM2M_URI_IS_SET_RESOURCE_INSTANCE(uriP)
@@ -263,17 +220,11 @@ uint8_t observe_handleRequest(lwm2m_context_t * contextP,
                 break;
             }
         }
-        // --- SignalK integration: subscribe to path ---
-        extern void signalk_observe_start(struct lws *wsi, const char *path);
-        extern char *lwm2m_uri_to_signalk_path(lwm2m_uri_t *uriP);
-        struct lws *wsi = NULL; // TODO: get actual WebSocket context
-        char *sk_path = lwm2m_uri_to_signalk_path(uriP);
-        if (sk_path) {
-            signalk_observe_start(wsi, sk_path);
-        }
-        // --- End SignalK integration ---
+
         coap_set_header_observe(response, watcherP->counter++);
+
         return COAP_205_CONTENT;
+
     case 1:
         // cancellation
         observedP = prv_findObserved(contextP, uriP);
@@ -283,54 +234,63 @@ uint8_t observe_handleRequest(lwm2m_context_t * contextP,
             if (watcherP)
             {
                 observe_cancel(contextP, watcherP->lastMid, serverP->sessionH);
-                // --- SignalK integration: unsubscribe from path ---
-                extern void signalk_observe_stop(struct lws *wsi, const char *path);
-                extern char *lwm2m_uri_to_signalk_path(lwm2m_uri_t *uriP);
-                struct lws *wsi = NULL; // TODO: get actual WebSocket context
-                char *sk_path = lwm2m_uri_to_signalk_path(uriP);
-                if (sk_path) {
-                    signalk_observe_stop(wsi, sk_path);
-                }
-                // --- End SignalK integration ---
             }
         }
         return COAP_205_CONTENT;
+
     default:
         return COAP_400_BAD_REQUEST;
     }
-        if (sk_path) {
-            signalk_observe_start(wsi, sk_path);
-        }
-        // --- End SignalK integration ---
+}
 
-        coap_set_header_observe(response, watcherP->counter++);
+void observe_cancel(lwm2m_context_t * contextP,
+                    uint16_t mid,
+                    void * fromSessionH)
+{
+    lwm2m_observed_t * observedP;
 
-        return COAP_205_CONTENT;
+    LOG_ARG_DBG("mid: %d", mid);
 
-    case 1:
-        // cancellation
-        observedP = prv_findObserved(contextP, uriP);
-        if (observedP)
+    for (observedP = contextP->observedList;
+         observedP != NULL;
+         observedP = observedP->next)
+    {
+        lwm2m_watcher_t * targetP = NULL;
+
+        if (observedP->watcherList->lastMid == mid
+         && lwm2m_session_is_equal(observedP->watcherList->server->sessionH, fromSessionH, contextP->userData))
         {
-            watcherP = prv_findWatcher(observedP, serverP);
-            if (watcherP)
+            targetP = observedP->watcherList;
+            observedP->watcherList = observedP->watcherList->next;
+        }
+        else
+        {
+            lwm2m_watcher_t * parentP;
+
+            parentP = observedP->watcherList;
+            while (parentP->next != NULL
+                && (parentP->next->lastMid != mid
+                 || !lwm2m_session_is_equal(parentP->next->server->sessionH, fromSessionH, contextP->userData)))
             {
-                observe_cancel(contextP, watcherP->lastMid, serverP->sessionH);
-                // --- SignalK integration: unsubscribe from path ---
-                extern void signalk_observe_stop(struct lws *wsi, const char *path);
-                extern char *lwm2m_uri_to_signalk_path(lwm2m_uri_t *uriP);
-                struct lws *wsi = NULL; // TODO: get actual WebSocket context
-                char *sk_path = lwm2m_uri_to_signalk_path(uriP);
-                if (sk_path) {
-                    signalk_observe_stop(wsi, sk_path);
-                }
-                // --- End SignalK integration ---
+                parentP = parentP->next;
+            }
+            if (parentP->next != NULL)
+            {
+                targetP = parentP->next;
+                parentP->next = parentP->next->next;
             }
         }
-        return COAP_205_CONTENT;
-
-    default:
-        return COAP_400_BAD_REQUEST;
+        if (targetP != NULL)
+        {
+            if (targetP->parameters != NULL) lwm2m_free(targetP->parameters);
+            lwm2m_free(targetP);
+            if (observedP->watcherList == NULL)
+            {
+                prv_unlinkObserved(contextP, observedP);
+                lwm2m_free(observedP);
+            }
+            return;
+        }
     }
 }
 
@@ -1016,10 +976,12 @@ int lwm2m_send(lwm2m_context_t *contextP, uint16_t shortServerID, lwm2m_uri_t *u
     (void)numUris;
     (void)callback;
     (void)userData;
-
     return COAP_415_UNSUPPORTED_CONTENT_FORMAT;
-#endif // End of #else for LWM2M_VERSION_1_0
+#endif
+}
+#endif
 
+#endif
 
 #ifdef LWM2M_SERVER_MODE
 
