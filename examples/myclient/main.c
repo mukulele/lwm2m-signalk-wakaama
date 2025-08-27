@@ -17,7 +17,7 @@ int main()
     objArray[1] = get_server_object();   // wird durch Bootstrap überschrieben
     objArray[2] = get_object_device();   // statische Geräteinfos
 
-    lwm2m_configure(context, "MyClient123", NULL, NULL, 3, objArray);
+    lwm2m_configure(context, "clipperIV", NULL, NULL, 3, objArray);
 
     while (1) {
         result = lwm2m_step(context, &timeout);
@@ -27,3 +27,4 @@ int main()
     lwm2m_close(context);
     return 0;
 }
+

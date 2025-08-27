@@ -2,6 +2,7 @@
 // Minimal Signal K WebSocket client using libwebsockets.
 // Compile with: gcc -o signalk_ws signalk_ws.c -lwebsockets -lcjson -lpthread
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -100,7 +101,7 @@ static struct lws_protocols protocols[] = {
     },
     { NULL, NULL, 0, 0 } /* terminator */
 };
-
+*/
 // Thread running the lws service loop
 static void *lws_service_thread(void *arg)
 {
