@@ -1185,7 +1185,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    objArray[3] = get_object_firmware();
+    // objArray[3] = get_object_firmware();
     if (NULL == objArray[3]) {
         fprintf(stderr, "Failed to create Firmware object\r\n");
         return -1;
@@ -1474,7 +1474,7 @@ int main(int argc, char *argv[]) {
     clean_server_object(objArray[1]);
     lwm2m_free(objArray[1]);
     free_object_device(objArray[2]);
-    free_object_firmware(objArray[3]);
+    // free_object_firmware(objArray[3]);
     free_object_location(objArray[4]);
     free_test_object(objArray[5]);
     free_object_conn_m(objArray[6]);

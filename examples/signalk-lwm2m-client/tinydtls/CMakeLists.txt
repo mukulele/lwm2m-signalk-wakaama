@@ -23,7 +23,7 @@ target_sources(
             ../common/object_connectivity_moni.c
             ../common/object_connectivity_stat.c
             ../common/object_device.c
-            ../common/object_firmware.c
+            
             ../common/object_location.c
             ../common/object_security.c
             ../common/object_server.c
