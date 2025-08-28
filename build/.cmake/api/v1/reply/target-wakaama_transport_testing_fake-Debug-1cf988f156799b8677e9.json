@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "CMakeFiles/wakaama_command_line.dir/examples/shared/commandline.c.o"
+			"path" : "CMakeFiles/wakaama_transport_testing_fake.dir/tests/helper/connection.c.o"
 		}
 	],
 	"backtrace" : 3,
@@ -39,31 +39,31 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 252,
+				"line" : 315,
 				"parent" : 2
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 88,
+				"line" : 109,
 				"parent" : 2
 			},
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 254,
+				"line" : 316,
 				"parent" : 2
 			},
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 255,
+				"line" : 317,
 				"parent" : 2
 			},
 			{
 				"command" : 4,
 				"file" : 0,
-				"line" : 253,
+				"line" : 318,
 				"parent" : 2
 			}
 		]
@@ -88,11 +88,11 @@
 			[
 				{
 					"backtrace" : 5,
-					"path" : "/home/pi/wakaama/include"
+					"path" : "/home/pi/wakaama/tests/helper"
 				},
 				{
 					"backtrace" : 6,
-					"path" : "/home/pi/wakaama/examples/shared"
+					"path" : "/home/pi/wakaama/include"
 				}
 			],
 			"language" : "C",
@@ -102,8 +102,8 @@
 			]
 		}
 	],
-	"id" : "wakaama_command_line::@6890427a1f51a3e7e1df",
-	"name" : "wakaama_command_line",
+	"id" : "wakaama_transport_testing_fake::@6890427a1f51a3e7e1df",
+	"name" : "wakaama_transport_testing_fake",
 	"paths" : 
 	{
 		"build" : ".",
@@ -124,7 +124,7 @@
 		{
 			"backtrace" : 7,
 			"compileGroupIndex" : 0,
-			"path" : "examples/shared/commandline.c",
+			"path" : "tests/helper/connection.c",
 			"sourceGroupIndex" : 0
 		}
 	],

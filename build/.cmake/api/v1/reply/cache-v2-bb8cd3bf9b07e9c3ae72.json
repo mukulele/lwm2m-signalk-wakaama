@@ -1950,6 +1950,30 @@
 			"value" : "1024"
 		},
 		{
+			"name" : "WAKAAMA_COAP_DEFAULT_MAX_RETRANSMIT",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Default CoAP max retransmissions"
+				}
+			],
+			"type" : "STRING",
+			"value" : "4"
+		},
+		{
+			"name" : "WAKAAMA_COAP_MAX_MESSAGE_SIZE",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Max. CoAP packet size."
+				}
+			],
+			"type" : "STRING",
+			"value" : "2048"
+		},
+		{
 			"name" : "WAKAAMA_COAP_RAW_BLOCK1_REQUESTS",
 			"properties" : 
 			[
@@ -1960,6 +1984,18 @@
 			],
 			"type" : "BOOL",
 			"value" : "OFF"
+		},
+		{
+			"name" : "WAKAAMA_COAP_SEPARATE_TIMEOUT",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "CoAP separate response timeout; Used if not set on a per-target basis"
+				}
+			],
+			"type" : "STRING",
+			"value" : "15"
 		},
 		{
 			"name" : "WAKAAMA_DATA_JSON",
@@ -2148,6 +2184,18 @@
 			],
 			"type" : "STRING",
 			"value" : "NONE"
+		},
+		{
+			"name" : "WAKAAMA_UNIT_TESTS",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Enable build of Unit Tests"
+				}
+			],
+			"type" : "BOOL",
+			"value" : "ON"
 		},
 		{
 			"name" : "_CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED",

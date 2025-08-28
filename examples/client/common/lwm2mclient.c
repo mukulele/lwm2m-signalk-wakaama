@@ -81,9 +81,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "wakaama_logger.h"  // Include the header file for our logger
-
-#define MAX_PACKET_SIZE 2048
 #define DEFAULT_SERVER_IPV6 "[::1]"
 #define DEFAULT_SERVER_IPV4 "127.0.0.1"
 
@@ -827,110 +824,6 @@ void print_usage(void) {
 #endif
     fprintf(stdout, "\r\n");
 }
-// START wakatiwai
-
-static char * server_get_uri(lwm2m_object_t * obj, uint16_t instanceId) {
-    int size = 1;
-    lwm2m_data_t * dataP = lwm2m_data_new(size);
-    dataP->id = 0; // security server uri
-    char * uriBuffer;
-
-    obj->readFunc(instanceId, &size, &dataP, obj);
-    if (dataP != NULL &&
-            (dataP->type == LWM2M_TYPE_STRING || dataP->type == LWM2M_TYPE_OPAQUE) &&
-            dataP->value.asBuffer.length > 0) {
-        uriBuffer = lwm2m_malloc(dataP->value.asBuffer.length + 1);
-        memset(uriBuffer, 0, dataP->value.asBuffer.length + 1);
-        strncpy(uriBuffer, (const char *) dataP->value.asBuffer.buffer, dataP->value.asBuffer.length);
-        lwm2m_data_free(size, dataP);
-        return uriBuffer;
-    }
-    lwm2m_data_free(size, dataP);
-    return NULL;
-
-}
-
-static uint16_t object_id_contains(uint16_t objectId, uint16_t * objectIdArray, uint16_t len) {
-    uint16_t result = 0;
-    uint16_t i = 0;
-    if (objectId < 1 || objectIdArray == NULL || len < 1) {
-        return result;
-    }
-    for (; i < len; i++) {
-        if (objectIdArray[i] == objectId) {
-            result = 1;
-            break;
-        }
-    }
-    return result;
-}
-
-static uint16_t * parse_object_id_csv(const char * objectIdCsv, uint16_t * objCount) {
-    uint16_t count = 1;
-    uint16_t buffIdx = 0;
-    uint16_t objectId = 0;
-    uint16_t objectIndex = 0;
-    uint16_t * objectIdArray;
-    char buff[12];
-    const char * c = objectIdCsv;
-    for (; *c != '\0'; c++) {
-        if (*c == ',') {
-            ++count;
-        }
-    }
-    c = objectIdCsv;
-    objectIdArray = lwm2m_malloc(sizeof(uint16_t) * count);
-    memset(objectIdArray, 0, sizeof(uint16_t) * count);
-    for (; *c != '\0'; c++) {
-        if (*c == ',') {
-            if (buffIdx > 11) {
-                fprintf(stderr, "Too long Object ID\r\n");
-                lwm2m_free(objectIdArray);
-                return NULL;
-            }
-            buff[buffIdx] = '\0';
-            objectId = strtol(buff, NULL, 10);
-            if (object_id_contains(objectId, objectIdArray, objectIndex)) {
-                // duplicate object ID, ignored.
-            } else  if (objectId > 3) {
-                objectIdArray[objectIndex++] = objectId;
-            } else {
-                fprintf(stderr, "Invalid Object ID\r\n");
-                lwm2m_free(objectIdArray);
-                return NULL;
-            }
-            buffIdx = 0;
-        } else {
-            buff[buffIdx++] = *c;
-        }
-    }
-    if (buffIdx > 11) {
-        fprintf(stderr, "Too long Object ID\r\n");
-        lwm2m_free(objectIdArray);
-        return NULL;
-    } else if (buffIdx > 0) {
-        buff[buffIdx] = '\0';
-        objectId = strtol(buff, NULL, 10);
-        if (objectId > 3) {
-            objectIdArray[objectIndex++] = objectId;
-        } else {
-            fprintf(stderr, "Invalid Object ID\r\n");
-            lwm2m_free(objectIdArray);
-            return NULL;
-        }
-    }
-    *objCount = objectIndex;
-#ifdef WITH_LOGS
-    uint16_t i = 0;
-    for (; i < objectIndex; i++) {
-      fprintf(stderr, ">>> %hu => ObjectID:[%hu] \r\n", i, objectIdArray[i]);
-    }
-    // 4 objects(/0,/1,/2,/3) are implicitly included
-    fprintf(stderr, ">>> %hu objects will be deployed as well as predfined 4 objects\r\n", *objCount);
-#endif
-    return objectIdArray;
-}
-// END wakatiwai
 
 int main(int argc, char *argv[]) {
     client_data_t data;
@@ -1357,7 +1250,7 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "Error in select(): %d %s\r\n", errno, strerror(errno));
             }
         } else if (result > 0) {
-            uint8_t buffer[MAX_PACKET_SIZE];
+            uint8_t buffer[LWM2M_COAP_MAX_MESSAGE_SIZE];
             ssize_t numBytes;
 
             /*
@@ -1372,12 +1265,13 @@ int main(int argc, char *argv[]) {
                 /*
                  * We retrieve the data received
                  */
-                numBytes = recvfrom(data.sock, buffer, MAX_PACKET_SIZE, 0, (struct sockaddr *)&addr, &addrLen);
+                numBytes =
+                    recvfrom(data.sock, buffer, LWM2M_COAP_MAX_MESSAGE_SIZE, 0, (struct sockaddr *)&addr, &addrLen);
 
                 if (0 > numBytes) {
                     fprintf(stderr, "Error in recvfrom(): %d %s\r\n", errno, strerror(errno));
-                } else if (numBytes >= MAX_PACKET_SIZE) {
-                    fprintf(stderr, "Received packet >= MAX_PACKET_SIZE\r\n");
+                } else if (numBytes >= LWM2M_COAP_MAX_MESSAGE_SIZE) {
+                    fprintf(stderr, "Received packet >= LWM2M_COAP_MAX_MESSAGE_SIZE\r\n");
                 } else if (0 < numBytes) {
                     char s[INET6_ADDRSTRLEN];
                     in_port_t port;

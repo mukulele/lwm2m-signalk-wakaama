@@ -31,6 +31,6 @@ target_sources(
             ../common/system_api.c
 )
 
-target_link_libraries(lwm2mclient PRIVATE wakaama_static gps)
+target_link_libraries(lwm2mclient PRIVATE wakaama_static)
 
 enable_testing()
