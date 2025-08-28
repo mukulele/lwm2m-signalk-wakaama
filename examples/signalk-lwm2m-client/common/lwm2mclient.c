@@ -1559,14 +1559,18 @@ int main(int argc, char *argv[]) {
 #ifdef LWM2M_BOOTSTRAP
         close_backup_object();
 #endif
+        // Close connections first before lwm2m_close
+        close(data.sock);
+        lwm2m_connection_free(data.connList);
+        
         // Only call lwm2m_close if we have a valid context
         if (lwm2mH) {
             lwm2m_close(lwm2mH);
         }
+    } else {
+        close(data.sock);
+        lwm2m_connection_free(data.connList);
     }
-
-    close(data.sock);
-    lwm2m_connection_free(data.connList);
 
     // Clean up objects with null checks
     if (objArray[0]) {
