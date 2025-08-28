@@ -90,7 +90,7 @@
 int g_reboot = 0;
 static int g_quit = 0;
 
-#define OBJ_COUNT 9
+#define OBJ_COUNT 8
 lwm2m_object_t *objArray[OBJ_COUNT];
 
 // only backup security and server objects
@@ -785,7 +785,7 @@ static void prv_display_objects(lwm2m_context_t *lwm2mH, char *buffer, void *use
             case LWM2M_CONN_MONITOR_OBJECT_ID:
                 break;
             case LWM2M_FIRMWARE_UPDATE_OBJECT_ID:
-                display_firmware_object(object);
+                // display_firmware_object(object); // Firmware object removed
                 break;
             case LWM2M_LOCATION_OBJECT_ID:
                 display_location_object(object);
@@ -835,7 +835,7 @@ static char * server_get_uri(lwm2m_object_t * obj, uint16_t instanceId) {
     dataP->id = 0; // security server uri
     char * uriBuffer;
 
-    obj->readFunc(instanceId, &size, &dataP, obj);
+    obj->readFunc(NULL, instanceId, &size, &dataP, obj);
     if (dataP != NULL &&
             (dataP->type == LWM2M_TYPE_STRING || dataP->type == LWM2M_TYPE_OPAQUE) &&
             dataP->value.asBuffer.length > 0) {
@@ -1186,10 +1186,13 @@ int main(int argc, char *argv[]) {
     }
 
     // objArray[3] = get_object_firmware();
+    objArray[3] = NULL;  // Firmware object removed
+    /*
     if (NULL == objArray[3]) {
         fprintf(stderr, "Failed to create Firmware object\r\n");
         return -1;
     }
+    */
 
     objArray[4] = get_object_location();
     if (NULL == objArray[4]) {
@@ -1215,21 +1218,24 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+    // Note: Access control object removed to keep OBJ_COUNT at 8
+    /*
     int instId = 0;
-    objArray[8] = acc_ctrl_create_object();
-    if (NULL == objArray[8]) {
+    objArray[7] = acc_ctrl_create_object();
+    if (NULL == objArray[7]) {
         fprintf(stderr, "Failed to create Access Control object\r\n");
         return -1;
-    } else if (acc_ctrl_obj_add_inst(objArray[8], instId, 3, 0, serverId) == false) {
+    } else if (acc_ctrl_obj_add_inst(objArray[7], instId, 3, 0, serverId) == false) {
         fprintf(stderr, "Failed to create Access Control object instance\r\n");
         return -1;
-    } else if (acc_ctrl_oi_add_ac_val(objArray[8], instId, 0, 0xF /* == 0b000000000001111 */) == false) {
+    } else if (acc_ctrl_oi_add_ac_val(objArray[7], instId, 0, 0xF) == false) {
         fprintf(stderr, "Failed to create Access Control ACL default resource\r\n");
         return -1;
-    } else if (acc_ctrl_oi_add_ac_val(objArray[8], instId, 999, 0x1 /* == 0b000000000000001 */) == false) {
+    } else if (acc_ctrl_oi_add_ac_val(objArray[7], instId, 999, 0x1) == false) {
         fprintf(stderr, "Failed to create Access Control ACL resource for serverId: 999\r\n");
         return -1;
     }
+    */
     /*
      * The liblwm2m library is now initialized with the functions that will be in
      * charge of communication
@@ -1479,7 +1485,7 @@ int main(int argc, char *argv[]) {
     free_test_object(objArray[5]);
     free_object_conn_m(objArray[6]);
     free_object_conn_s(objArray[7]);
-    acl_ctrl_free_object(objArray[8]);
+    // acl_ctrl_free_object(objArray[8]); // Access control object removed
 
     return 0;
 }

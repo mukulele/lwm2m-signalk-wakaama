@@ -24,6 +24,11 @@
  #include <ctype.h>
  #include <sys/select.h>
  #include <sys/types.h>
+
+ // Define missing constants
+ #define MAX_MESSAGE_SIZE 2048
+ #define MAX_RESOURCES 64
+ #define URI_STRING_MAX_LEN 256
  #include <sys/socket.h>
  #include <netinet/in.h>
  #include <arpa/inet.h>
@@ -47,7 +52,7 @@
  } generic_obj_instance_t;
  
  
- static uint8_t * find_base64_from_response(char * cmd, uint8_t * resp, uint16_t ** len)
+ static uint8_t * find_base64_from_response(char * cmd, uint8_t * resp, size_t * len)
  {
      // /resp:{command}:{base64 length}:{base64 payload}\r\n
      uint8_t * pc;
@@ -69,7 +74,7 @@
      }
      // '{base64 length}'
      pc = strtok(NULL, ":");
-     *len = atoi((const char *)pc);
+     *len = (size_t)atoi((const char *)pc);
      // {base64 payload}
      pc = strtok(NULL, ":");
      if (pc == NULL) {

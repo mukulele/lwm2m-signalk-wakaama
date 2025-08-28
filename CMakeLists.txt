@@ -4,13 +4,9 @@ project(wakaama C)
 
 include(wakaama.cmake)
 
-# Enable "test" target
-enable_testing()
-add_subdirectory(tests)
+option(WAKAAMA_UNIT_TESTS "Enable build of Unit Tests" ON)
 
-# SignalK WebSocket client example
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LWS REQUIRED libwebsockets)
-add_executable(signalK_client src/signalK_client.c src/signalK_observe.c)
-target_include_directories(signalK_client PRIVATE ${LWS_INCLUDE_DIRS})
-target_link_libraries(signalK_client PRIVATE ${LWS_LIBRARIES} cjson)
+if(WAKAAMA_UNIT_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
