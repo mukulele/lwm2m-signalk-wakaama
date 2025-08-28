@@ -59,6 +59,8 @@
 #include "lwm2mclient.h"
 #include "commandline.h"
 #include "liblwm2m.h"
+#include "bridge_object.h"
+#include "../websocket_client/signalk_ws.h"
 #ifdef WITH_TINYDTLS
 #include "tinydtls/connection.h"
 #else
@@ -90,7 +92,7 @@
 int g_reboot = 0;
 static int g_quit = 0;
 
-#define OBJ_COUNT 8
+#define OBJ_COUNT 6
 lwm2m_object_t *objArray[OBJ_COUNT];
 
 // only backup security and server objects
@@ -825,6 +827,9 @@ void print_usage(void) {
     fprintf(stdout, "  -s HEXSTRING\tSet the device management or bootstrap server Pre-Shared-Key. If not set use none "
                     "secure mode\r\n");
 #endif
+    fprintf(stdout, "  -k\t\tEnable SignalK WebSocket client with default settings (localhost:3000)\r\n");
+    fprintf(stdout, "  -K HOST\tSet SignalK server hostname and enable WebSocket client. Default: localhost\r\n");
+    fprintf(stdout, "  -P PORT\tSet SignalK server port and enable WebSocket client. Default: 3000\r\n");
     fprintf(stdout, "\r\n");
 }
 // START wakatiwai
@@ -946,6 +951,12 @@ int main(int argc, char *argv[]) {
     int opt;
     bool bootstrapRequested = false;
     bool serverPortChanged = false;
+
+    // SignalK WebSocket parameters
+    const char *signalk_server = "localhost";
+    int signalk_port = 3000;
+    bool signalk_enabled = false;
+    bool signalk_started = false;
 
 #ifdef LWM2M_BOOTSTRAP
     lwm2m_client_state_t previousState = STATE_INITIAL;
@@ -1102,6 +1113,30 @@ int main(int argc, char *argv[]) {
                 print_usage();
                 return 0;
             }
+        case 'k':
+            signalk_enabled = true;
+            break;
+        case 'K':
+            opt++;
+            if (opt >= argc) {
+                print_usage();
+                return 0;
+            }
+            signalk_server = argv[opt];
+            signalk_enabled = true;
+            break;
+        case 'P':
+            opt++;
+            if (opt >= argc) {
+                print_usage();
+                return 0;
+            }
+            if (1 != sscanf(argv[opt], "%d", &signalk_port)) {
+                print_usage();
+                return 0;
+            }
+            signalk_enabled = true;
+            break;
         default:
             print_usage();
             return 0;
@@ -1185,14 +1220,11 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    // objArray[3] = get_object_firmware();
-    objArray[3] = NULL;  // Firmware object removed
-    /*
+    objArray[3] = get_object_firmware();
     if (NULL == objArray[3]) {
         fprintf(stderr, "Failed to create Firmware object\r\n");
         return -1;
     }
-    */
 
     objArray[4] = get_object_location();
     if (NULL == objArray[4]) {
@@ -1206,19 +1238,15 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    objArray[6] = get_object_conn_m();
-    if (NULL == objArray[6]) {
+    objArray[5] = get_object_conn_m();
+    if (NULL == objArray[5]) {
         fprintf(stderr, "Failed to create connectivity monitoring object\r\n");
         return -1;
     }
 
-    objArray[7] = get_object_conn_s();
-    if (NULL == objArray[7]) {
-        fprintf(stderr, "Failed to create connectivity statistics object\r\n");
-        return -1;
-    }
+    // Connectivity statistics object removed due to crashes
 
-    // Note: Access control object removed to keep OBJ_COUNT at 8
+    // Note: Access control object removed to keep OBJ_COUNT at 6
     /*
     int instId = 0;
     objArray[7] = acc_ctrl_create_object();
@@ -1266,7 +1294,13 @@ int main(int argc, char *argv[]) {
      */
     init_value_change(lwm2mH);
 
+    // Initialize SignalK bridge system
+    bridge_init();
+
     fprintf(stdout, "LWM2M Client \"%s\" started on port %s\r\n", name, localPort);
+    if (signalk_enabled) {
+        fprintf(stdout, "SignalK integration enabled - will start after LwM2M registration\r\n");
+    }
     fprintf(stdout, "> ");
     fflush(stdout);
     /*
@@ -1336,6 +1370,22 @@ int main(int argc, char *argv[]) {
             fprintf(stdout, "Unknown...\r\n");
             break;
         }
+        
+        // Start SignalK WebSocket client when LwM2M registration is complete
+        if (signalk_enabled && !signalk_started && lwm2mH->state == STATE_READY) {
+            fprintf(stdout, "[SIGNALK] LwM2M registration complete - starting SignalK WebSocket client: %s:%d\r\n", 
+                    signalk_server, signalk_port);
+            
+            if (signalk_ws_start(signalk_server, signalk_port) != 0) {
+                fprintf(stderr, "[SIGNALK] Warning: Failed to start SignalK WebSocket client (server may not be running)\r\n");
+                fprintf(stderr, "[SIGNALK] Continuing without SignalK integration...\r\n");
+            } else {
+                fprintf(stdout, "[SIGNALK] WebSocket client started successfully\r\n");
+                fprintf(stdout, "[SIGNALK] Bridge system ready - marine data will be bridged to LwM2M objects\r\n");
+                signalk_started = true;
+            }
+        }
+        
         if (result != 0) {
             fprintf(stderr, "lwm2m_step() failed: 0x%X\r\n", result);
 #ifdef LWM2M_BOOTSTRAP
@@ -1422,7 +1472,7 @@ int main(int argc, char *argv[]) {
 #else
                         lwm2m_handle_packet(lwm2mH, buffer, (size_t)numBytes, connP);
 #endif
-                        conn_s_updateRxStatistic(objArray[7], numBytes, false);
+                        // conn_s_updateRxStatistic removed - no connectivity statistics object
                     } else {
                         fprintf(stderr, "received bytes ignored!\r\n");
                     }
@@ -1472,6 +1522,13 @@ int main(int argc, char *argv[]) {
 #endif
         lwm2m_close(lwm2mH);
     }
+
+    // Cleanup SignalK WebSocket client
+    if (signalk_enabled) {
+        fprintf(stdout, "Stopping SignalK WebSocket client\r\n");
+        signalk_ws_stop();
+    }
+
     close(data.sock);
     lwm2m_connection_free(data.connList);
 
@@ -1480,12 +1537,11 @@ int main(int argc, char *argv[]) {
     clean_server_object(objArray[1]);
     lwm2m_free(objArray[1]);
     free_object_device(objArray[2]);
-    // free_object_firmware(objArray[3]);
+    free_object_firmware(objArray[3]);
     free_object_location(objArray[4]);
     free_test_object(objArray[5]);
     free_object_conn_m(objArray[6]);
-    free_object_conn_s(objArray[7]);
-    // acl_ctrl_free_object(objArray[8]); // Access control object removed
+    // free_object_conn_s - removed with connectivity statistics object
 
     return 0;
 }

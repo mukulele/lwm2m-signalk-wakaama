@@ -21,17 +21,38 @@ target_sources(
             ../common/lwm2mclient.h
             ../common/object_access_control.c
             ../common/object_connectivity_moni.c
-            ../common/object_connectivity_stat.c
             ../common/object_device.c
+            ../common/object_firmware.c
             ../common/object_location.c
             ../common/object_security.c
             ../common/object_server.c
             ../common/object_test.c
+            ../common/object_3300.c
+            ../common/bridge_object.c
+            ../common/bridge_object.h
             ../common/system_api.c
+            ../websocket_client/signalk_ws.c
+            ../websocket_client/signalk_ws.h
 )
 
-target_include_directories(signalk-lwm2m-client PRIVATE ../base64)
+target_include_directories(signalk-lwm2m-client PRIVATE ../base64 ../common ../websocket_client)
 
-target_link_libraries(signalk-lwm2m-client PRIVATE wakaama_static gps)
+# Find required libraries for WebSocket support
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
+pkg_check_modules(CJSON REQUIRED libcjson)
+
+target_link_libraries(signalk-lwm2m-client PRIVATE 
+    wakaama_static 
+    gps 
+    ${LIBWEBSOCKETS_LIBRARIES}
+    ${CJSON_LIBRARIES}
+    pthread
+)
+
+target_include_directories(signalk-lwm2m-client PRIVATE 
+    ${LIBWEBSOCKETS_INCLUDE_DIRS}
+    ${CJSON_INCLUDE_DIRS}
+)
 
 enable_testing()

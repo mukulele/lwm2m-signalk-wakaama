@@ -14,13 +14,17 @@ typedef struct
 // -----------------------------------------------------------------------------
 // READ callback
 // -----------------------------------------------------------------------------
-static uint8_t prv_read(uint16_t instanceId,
+static uint8_t prv_read(lwm2m_context_t *contextP,
+                        uint16_t instanceId,
                         int *numDataP,
                         lwm2m_data_t **dataArray,
                         lwm2m_object_t *objectP)
 {
     sensor_instance_t *inst = (sensor_instance_t *)objectP->userData;
     if (!inst) return COAP_404_NOT_FOUND;
+
+    /* unused parameter */
+    (void)contextP;
 
     if (*numDataP == 0)
     {
@@ -53,13 +57,19 @@ static uint8_t prv_read(uint16_t instanceId,
 // -----------------------------------------------------------------------------
 // WRITE callback
 // -----------------------------------------------------------------------------
-static uint8_t prv_write(uint16_t instanceId,
+static uint8_t prv_write(lwm2m_context_t *contextP,
+                         uint16_t instanceId,
                          int numData,
                          lwm2m_data_t *dataArray,
-                         lwm2m_object_t *objectP)
+                         lwm2m_object_t *objectP,
+                         lwm2m_write_type_t writeType)
 {
     sensor_instance_t *inst = (sensor_instance_t *)objectP->userData;
     if (!inst) return COAP_404_NOT_FOUND;
+
+    /* unused parameters */
+    (void)contextP;
+    (void)writeType;
 
     for (int i = 0; i < numData; i++)
     {
@@ -67,28 +77,31 @@ static uint8_t prv_write(uint16_t instanceId,
         {
         case 5700: // Sensor Value
         {
-            char *val = NULL;
-            int len = lwm2m_data_decode_string(&dataArray[i], &val);
-            if (len > 0 && val)
-            {
-                strncpy(inst->value, val, sizeof(inst->value));
-                inst->value[sizeof(inst->value) - 1] = '\0';
-                free(val);
-
-                // Push back into bridge
-                bridge_update(inst->path, inst->value);
+            if (dataArray[i].type == LWM2M_TYPE_STRING || dataArray[i].type == LWM2M_TYPE_OPAQUE) {
+                char *val = (char *)malloc(dataArray[i].value.asBuffer.length + 1);
+                if (val) {
+                    memcpy(val, dataArray[i].value.asBuffer.buffer, dataArray[i].value.asBuffer.length);
+                    val[dataArray[i].value.asBuffer.length] = '\0';
+                    strncpy(inst->value, val, sizeof(inst->value) - 1);
+                    inst->value[sizeof(inst->value) - 1] = '\0';
+                    free(val);
+                    // Push back into bridge
+                    bridge_update(inst->path, inst->value);
+                }
             }
             break;
         }
         case 5701: // Units
         {
-            char *val = NULL;
-            int len = lwm2m_data_decode_string(&dataArray[i], &val);
-            if (len > 0 && val)
-            {
-                strncpy(inst->units, val, sizeof(inst->units));
-                inst->units[sizeof(inst->units) - 1] = '\0';
-                free(val);
+            if (dataArray[i].type == LWM2M_TYPE_STRING || dataArray[i].type == LWM2M_TYPE_OPAQUE) {
+                char *val = (char *)malloc(dataArray[i].value.asBuffer.length + 1);
+                if (val) {
+                    memcpy(val, dataArray[i].value.asBuffer.buffer, dataArray[i].value.asBuffer.length);
+                    val[dataArray[i].value.asBuffer.length] = '\0';
+                    strncpy(inst->units, val, sizeof(inst->units) - 1);
+                    inst->units[sizeof(inst->units) - 1] = '\0';
+                    free(val);
+                }
             }
             break;
         }
@@ -103,11 +116,15 @@ static uint8_t prv_write(uint16_t instanceId,
 // -----------------------------------------------------------------------------
 // DISCOVER callback
 // -----------------------------------------------------------------------------
-static uint8_t prv_discover(uint16_t instanceId,
+static uint8_t prv_discover(lwm2m_context_t *contextP,
+                            uint16_t instanceId,
                             int *numDataP,
                             lwm2m_data_t **dataArray,
                             lwm2m_object_t *objectP)
 {
+    /* unused parameter */
+    (void)contextP;
+    
     // Just advertise resources 5700 and 5701
     if (*numDataP == 0)
     {
@@ -123,9 +140,13 @@ static uint8_t prv_discover(uint16_t instanceId,
 // -----------------------------------------------------------------------------
 // DELETE callback (server deletes instance)
 // -----------------------------------------------------------------------------
-static uint8_t prv_delete(uint16_t id,
+static uint8_t prv_delete(lwm2m_context_t *contextP,
+                          uint16_t id,
                           lwm2m_object_t *objectP)
 {
+    /* unused parameter */
+    (void)contextP;
+    
     if (objectP->userData)
     {
         free(objectP->userData);
@@ -153,13 +174,16 @@ lwm2m_object_t * get_object_generic_sensor(const char *path, const char *units)
     }
     memset(inst, 0, sizeof(sensor_instance_t));
 
-    strncpy(inst->path, path, sizeof(inst->path));
-    strncpy(inst->units, units ? units : "", sizeof(inst->units));
+    strncpy(inst->path, path, sizeof(inst->path) - 1);
+    strncpy(inst->units, units ? units : "", sizeof(inst->units) - 1);
     strcpy(inst->value, "0"); // default
 
     // Add single instance 0
-    lwm2m_list_t *instance = lwm2m_list_new(0);
-    obj->instanceList = instance;
+    obj->instanceList = (lwm2m_list_t *)lwm2m_malloc(sizeof(lwm2m_list_t));
+    if (obj->instanceList != NULL) {
+        memset(obj->instanceList, 0, sizeof(lwm2m_list_t));
+        obj->instanceList->id = 0;
+    }
 
     obj->readFunc     = prv_read;
     obj->writeFunc    = prv_write;
@@ -169,7 +193,22 @@ lwm2m_object_t * get_object_generic_sensor(const char *path, const char *units)
     obj->userData = inst;
 
     // Register with bridge (maps SignalK path → LwM2M resource)
-    bridge_register(path, obj, 0, 5700);
+    // Note: Bridge registration will be done after all objects are created
+    // bridge_register(3300, 0, 5700, path);
 
     return obj;
+}
+
+void free_object_generic_sensor(lwm2m_object_t *objectP)
+{
+    if (objectP != NULL)
+    {
+        if (objectP->userData != NULL)
+        {
+            free(objectP->userData);
+            objectP->userData = NULL;
+        }
+        lwm2m_list_free(objectP->instanceList);
+        lwm2m_free(objectP);
+    }
 }

@@ -98,7 +98,7 @@ static struct lws_protocols protocols[] = {
 
 static void *ws_loop(void *arg)
 {
-    while (running)
+    while (running && context)
     {
         lws_service(context, 100);
     }
@@ -131,17 +131,35 @@ int signalk_ws_start(const char *server, int port)
 
     wsi = lws_client_connect_via_info(&ccinfo);
     if (!wsi) {
-        fprintf(stderr, "[SignalK] Failed to connect\n");
+        fprintf(stderr, "[SignalK] Failed to connect to %s:%d\n", server, port);
+        lws_context_destroy(context);
+        context = NULL;
         return -1;
     }
 
-    pthread_create(&ws_thread, NULL, ws_loop, NULL);
+    running = 1;
+    if (pthread_create(&ws_thread, NULL, ws_loop, NULL) != 0) {
+        fprintf(stderr, "[SignalK] Failed to create thread\n");
+        lws_context_destroy(context);
+        context = NULL;
+        wsi = NULL;
+        return -1;
+    }
+    
     return 0;
 }
 
 void signalk_ws_stop(void)
 {
-    running = 0;
-    pthread_join(ws_thread, NULL);
-    lws_context_destroy(context);
+    if (running) {
+        running = 0;
+        if (ws_thread) {
+            pthread_join(ws_thread, NULL);
+        }
+    }
+    if (context) {
+        lws_context_destroy(context);
+        context = NULL;
+    }
+    wsi = NULL;
 }
