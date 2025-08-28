@@ -121,7 +121,11 @@ static void prv_quit(lwm2m_context_t *lwm2mH, char *buffer, void *user_data) {
     g_quit = 1;
 }
 
-void handle_sigint(int signum) { g_quit = 2; }
+void handle_sigint(int signum) { 
+    fprintf(stdout, "\n[SIGNAL] Received SIGINT, shutting down gracefully...\n");
+    fflush(stdout);
+    g_quit = 2; 
+}
 
 void handle_value_changed(lwm2m_context_t *lwm2mH, lwm2m_uri_t *uri, const char *value, size_t valueLength) {
     lwm2m_object_t *object = (lwm2m_object_t *)LWM2M_LIST_FIND(lwm2mH->objectList, uri->objectId);
@@ -1346,28 +1350,46 @@ int main(int argc, char *argv[]) {
          *    (eg. retransmission) and the time between the next operation
          */
         result = lwm2m_step(lwm2mH, &(tv.tv_sec));
-        fprintf(stdout, " -> State: ");
-        switch (lwm2mH->state) {
-        case STATE_INITIAL:
-            fprintf(stdout, "STATE_INITIAL\r\n");
-            break;
-        case STATE_BOOTSTRAP_REQUIRED:
-            fprintf(stdout, "STATE_BOOTSTRAP_REQUIRED\r\n");
-            break;
-        case STATE_BOOTSTRAPPING:
-            fprintf(stdout, "STATE_BOOTSTRAPPING\r\n");
-            break;
-        case STATE_REGISTER_REQUIRED:
-            fprintf(stdout, "STATE_REGISTER_REQUIRED\r\n");
-            break;
-        case STATE_REGISTERING:
-            fprintf(stdout, "STATE_REGISTERING\r\n");
-            break;
-        case STATE_READY:
-            fprintf(stdout, "STATE_READY\r\n");
-            break;
-        default:
-            fprintf(stdout, "Unknown...\r\n");
+        
+        // Prevent busy loops by ensuring minimum timeout
+        if (tv.tv_sec == 0 && tv.tv_usec == 0) {
+            tv.tv_sec = 0;
+            tv.tv_usec = 100000; // 100ms minimum timeout
+        }
+        
+        // Only print state changes, not every loop iteration
+        static int last_state = -1;
+        if (lwm2mH->state != last_state) {
+            fprintf(stdout, " -> State: ");
+            switch (lwm2mH->state) {
+            case STATE_INITIAL:
+                fprintf(stdout, "STATE_INITIAL\r\n");
+                break;
+            case STATE_BOOTSTRAP_REQUIRED:
+                fprintf(stdout, "STATE_BOOTSTRAP_REQUIRED\r\n");
+                break;
+            case STATE_BOOTSTRAPPING:
+                fprintf(stdout, "STATE_BOOTSTRAPPING\r\n");
+                break;
+            case STATE_REGISTER_REQUIRED:
+                fprintf(stdout, "STATE_REGISTER_REQUIRED\r\n");
+                break;
+            case STATE_REGISTERING:
+                fprintf(stdout, "STATE_REGISTERING\r\n");
+                break;
+            case STATE_READY:
+                fprintf(stdout, "STATE_READY\r\n");
+                break;
+            default:
+                fprintf(stdout, "Unknown...\r\n");
+                break;
+            }
+            last_state = lwm2mH->state;
+        }
+        
+        // Check for quit signal early for faster response
+        if (g_quit != 0) {
+            fprintf(stdout, "Shutting down...\r\n");
             break;
         }
         
@@ -1503,8 +1525,15 @@ int main(int argc, char *argv[]) {
                     fprintf(stdout, "\r\n");
                 }
 
-                lwm2m_free(line);
+                if (line) {
+                    lwm2m_free(line);
+                }
             }
+        }
+        
+        // Check for quit signal again before next iteration
+        if (g_quit != 0) {
+            break;
         }
     }
 
@@ -1512,35 +1541,57 @@ int main(int argc, char *argv[]) {
      * Finally when the loop is left smoothly - asked by user in the command line interface - we unregister our client
      * from it
      */
-    if (g_quit == 1) {
+    
+    // Cleanup SignalK WebSocket client first to avoid thread issues
+    if (signalk_enabled && signalk_started) {
+        fprintf(stdout, "Stopping SignalK WebSocket client\r\n");
+        signalk_ws_stop();
+    }
+    
+    // Handle both graceful quit (1) and signal quit (2)
+    if (g_quit == 1 || g_quit == 2) {
 #ifdef WITH_TINYDTLS
-        free(pskBuffer);
+        if (pskBuffer) {
+            free(pskBuffer);
+        }
 #endif
 
 #ifdef LWM2M_BOOTSTRAP
         close_backup_object();
 #endif
-        lwm2m_close(lwm2mH);
-    }
-
-    // Cleanup SignalK WebSocket client
-    if (signalk_enabled) {
-        fprintf(stdout, "Stopping SignalK WebSocket client\r\n");
-        signalk_ws_stop();
+        // Only call lwm2m_close if we have a valid context
+        if (lwm2mH) {
+            lwm2m_close(lwm2mH);
+        }
     }
 
     close(data.sock);
     lwm2m_connection_free(data.connList);
 
-    clean_security_object(objArray[0]);
-    lwm2m_free(objArray[0]);
-    clean_server_object(objArray[1]);
-    lwm2m_free(objArray[1]);
-    free_object_device(objArray[2]);
-    free_object_firmware(objArray[3]);
-    free_object_location(objArray[4]);
-    free_test_object(objArray[5]);
-    free_object_conn_m(objArray[6]);
+    // Clean up objects with null checks
+    if (objArray[0]) {
+        clean_security_object(objArray[0]);
+        lwm2m_free(objArray[0]);
+    }
+    if (objArray[1]) {
+        clean_server_object(objArray[1]);
+        lwm2m_free(objArray[1]);
+    }
+    if (objArray[2]) {
+        free_object_device(objArray[2]);
+    }
+    if (objArray[3]) {
+        free_object_firmware(objArray[3]);
+    }
+    if (objArray[4]) {
+        free_object_location(objArray[4]);
+    }
+    if (objArray[5]) {
+        free_test_object(objArray[5]);
+    }
+    if (objArray[6]) {
+        free_object_conn_m(objArray[6]);
+    }
     // free_object_conn_s - removed with connectivity statistics object
 
     return 0;

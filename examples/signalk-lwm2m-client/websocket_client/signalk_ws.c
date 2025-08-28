@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include "bridge_object.h"
 
@@ -98,10 +99,15 @@ static struct lws_protocols protocols[] = {
 
 static void *ws_loop(void *arg)
 {
+    printf("[SignalK] WebSocket service loop started\n");
     while (running && context)
     {
-        lws_service(context, 100);
+        if (lws_service(context, 100) < 0) {
+            printf("[SignalK] WebSocket service error, breaking loop\n");
+            break;
+        }
     }
+    printf("[SignalK] WebSocket service loop ended\n");
     return NULL;
 }
 
@@ -152,14 +158,24 @@ int signalk_ws_start(const char *server, int port)
 void signalk_ws_stop(void)
 {
     if (running) {
+        printf("[SignalK] Stopping WebSocket client...\n");
         running = 0;
+        
+        // Give the thread a moment to check the running flag
+        usleep(100000); // 100ms
+        
         if (ws_thread) {
+            printf("[SignalK] Waiting for WebSocket thread to finish...\n");
             pthread_join(ws_thread, NULL);
+            ws_thread = 0;
         }
     }
+    
     if (context) {
+        printf("[SignalK] Destroying WebSocket context...\n");
         lws_context_destroy(context);
         context = NULL;
     }
     wsi = NULL;
+    printf("[SignalK] WebSocket client stopped\n");
 }
