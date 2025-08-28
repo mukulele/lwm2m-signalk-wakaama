@@ -391,7 +391,8 @@ static void prv_change(lwm2m_context_t *lwm2mH, char *buffer, void *user_data) {
     buffer = get_next_arg(end, &end);
 
     if (buffer[0] == 0) {
-        fprintf(stderr, "report change!\n");
+        fprintf(stdout, "[OBSERVE] Triggering resource value change for /%d/%d/%d\r\n", 
+                uri.objectId, uri.instanceId, uri.resourceId);
         lwm2m_resource_value_changed(lwm2mH, &uri);
     } else {
         handle_value_changed(lwm2mH, &uri, buffer, end - buffer);
@@ -567,6 +568,33 @@ syntax_error:
     fprintf(stdout, "Syntax error !\n");
 }
 #endif
+
+static void prv_test_observe(lwm2m_context_t *lwm2mH, char *buffer, void *user_data) {
+    lwm2m_uri_t uri;
+    int result;
+    
+    (void)buffer;   /* unused */
+    (void)user_data; /* unused */
+    
+    // Force a battery level change to trigger observation notification
+    fprintf(stdout, "[OBSERVE] Forcing battery level change to test observations\r\n");
+    
+    // Trigger battery resource change (Device Object /3/0/9)
+    result = lwm2m_stringToUri("/3/0/9", 6, &uri);
+    if (result > 0) {
+        fprintf(stdout, "[OBSERVE] Triggering notification for /3/0/9 (Battery Level)\r\n");
+        lwm2m_resource_value_changed(lwm2mH, &uri);
+    }
+    
+    // Also trigger current time change (Device Object /3/0/13)
+    result = lwm2m_stringToUri("/3/0/13", 7, &uri);
+    if (result > 0) {
+        fprintf(stdout, "[OBSERVE] Triggering notification for /3/0/13 (Current Time)\r\n");
+        lwm2m_resource_value_changed(lwm2mH, &uri);
+    }
+    
+    fprintf(stdout, "[OBSERVE] Test notifications sent - check for observe responses\r\n");
+}
 
 static void update_battery_level(lwm2m_context_t *context) {
     static time_t next_change_time = 0;
@@ -1015,6 +1043,7 @@ int main(int argc, char *argv[]) {
          prv_object_dump, NULL},
         {"add", "Add support of object 31024", NULL, prv_add, NULL},
         {"rm", "Remove support of object 31024", NULL, prv_remove, NULL},
+        {"testobs", "Trigger battery level change for observation testing", NULL, prv_test_observe, NULL},
         {"quit", "Quit the client gracefully.", NULL, prv_quit, NULL},
         {"^C", "Quit the client abruptly (without sending a de-register message).", NULL, NULL, NULL},
 
