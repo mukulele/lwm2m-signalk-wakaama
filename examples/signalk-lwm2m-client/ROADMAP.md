@@ -46,18 +46,12 @@
 ## 🚀 Phase 1: Advanced Object Implementation (Next 2-4 weeks)
 
 ### LwM2M Object Expansion
-- [ ] **Device Object (3)** - Enhanced implementation
-  - [ ] Manufacturer, Model, Serial Number from SignalK self/design
-  - [ ] Firmware Version and Hardware Version detection
-  - [ ] Available Power Sources enumeration
-  - [ ] Error Codes and Reset functionality
-  - [ ] Battery level from electrical.batteries
-
-- [ ] **Connectivity Monitoring Object (4)**
-  - [ ] Network Bearer detection (cellular/wifi/ethernet)
-  - [ ] Radio Signal Strength from system metrics
-  - [ ] Link Quality and IP address reporting
-  - [ ] Connection statistics and health metrics
+- [x] **Device Object (3)** - Enhanced implementation ✅ **COMPLETED**
+  - [x] Manufacturer, Model, Serial Number from hardware platform detection ✨ **NEW**
+  - [x] Firmware Version and Hardware Version detection ✨ **NEW** 
+  - [x] System health monitoring (CPU temp, memory, disk usage) ✨ **NEW**
+  - [x] Real hardware identification for fleet management ✨ **NEW**
+  - ~~Battery level from electrical.batteries~~ (hardware-focused approach only)
 
 ### SignalK Data Expansion
 - [ ] **Enhanced Navigation**
@@ -97,14 +91,14 @@
 ### Reliability & Performance
 - [x] **Advanced Connection Management** ✅ **COMPLETED**
   - [x] Automatic reconnection with exponential backoff ✅ **NEW**
-  - [ ] Connection health monitoring and diagnostics
-  - [ ] Multi-server failover support
+  - ~~Connection health monitoring and diagnostics~~ (not needed)
+  - ~~Multi-server failover support~~ (not needed)
 
-- [ ] **Data Quality & Validation**
-  - [ ] SignalK data range validation and sanitization
-  - [ ] Stale data detection with configurable timeouts
-  - [ ] Data consistency checks and error reporting
-  - [ ] Historical data buffering for reliability
+- ~~**Data Quality & Validation**~~ (handled by SignalK server - out of scope)
+  - ~~SignalK data range validation and sanitization~~
+  - ~~Stale data detection with configurable timeouts~~
+  - ~~Data consistency checks and error reporting~~
+  - ~~Historical data buffering for reliability~~
 
 ### Configuration Evolution
 - [x] **Advanced Configuration** ✨ NEW
@@ -124,7 +118,11 @@
 ### Enhanced Bi-directional Communication
 - [x] **Advanced Control Operations** ✅ **COMPLETED**
   - [x] SignalK PUT command integration for vessel system control ✅ **NEW**
-  - [ ] Security framework for remote commands
+  - [x] **SignalK Authentication for PUT Requests** ✅ **COMPLETED**
+    - [x] Optional WebSocket token-based authentication implementation ✨ **NEW**
+    - [x] Automatic token renewal and validation ✨ **NEW**
+    - [x] Graceful degradation for unauthenticated servers ✨ **NEW**
+    - [x] Configuration-driven authentication (enabled/disabled) ✨ **NEW**
   - [ ] Audit trail for all write operations
   - [ ] Command confirmation and error handling
 
@@ -135,17 +133,15 @@
   - [ ] Safety system status aggregation
   - [ ] Maintenance scheduling and alerts
 
-### Data Intelligence
-- [ ] **Offline Resilience**
-  - [ ] Local data storage during connectivity loss
-  - [ ] Intelligent sync when connection restored
-  - [ ] Configurable retention and compression
-  - [ ] Bandwidth optimization for catch-up
-
 ## 🔐 Phase 4: Security & Enterprise (8-10 weeks)
 
 ### Security Framework
-- [ ] **DTLS/TLS Security**
+- [ ] **SignalK Security Integration** ✨ **PRIORITY**
+  - [ ] Token-based authentication for PUT requests
+  - [ ] Username/password configuration management
+  - [ ] Automatic token renewal
+  - [ ] Authentication error handling and fallback
+- [ ] **DTLS/TLS Security** (future enhancement)
   - [ ] Certificate-based authentication
   - [ ] Secure credential management
   - [ ] Certificate rotation and renewal

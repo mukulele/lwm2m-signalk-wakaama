@@ -118,6 +118,20 @@
         "min_period_ms": 30000,
         "high_precision": false,
         "description": "Network interface information"
+      },
+      {
+        "path": "electrical.batteries.house.capacity.stateOfCharge",
+        "period_ms": 30000,
+        "min_period_ms": 15000,
+        "high_precision": false,
+        "description": "House battery state of charge (percentage)"
+      },
+      {
+        "path": "electrical.batteries.engine.capacity.stateOfCharge",
+        "period_ms": 30000,
+        "min_period_ms": 15000,
+        "high_precision": false,
+        "description": "Engine battery state of charge (percentage)"
       }
     ]
   },

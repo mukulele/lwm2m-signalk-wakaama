@@ -1,0 +1,64 @@
+{
+  "signalk_subscriptions": {
+    "server": {
+      "host": "127.0.0.1",
+      "port": 3000,
+      "path": "/signalk/v1/stream",
+      "subscribe_mode": "none",
+      "authentication": {
+        "enabled": true,
+        "username": "test_vessel",
+        "password": "secure_password",
+        "token_renewal_time": 3600
+      }
+    },
+    "subscriptions": [
+      {
+        "path": "navigation.position",
+        "period_ms": 1000,
+        "min_period_ms": 500,
+        "high_precision": true,
+        "description": "Vessel position (latitude/longitude)"
+      },
+      {
+        "path": "navigation.speedOverGround",
+        "period_ms": 1000,
+        "min_period_ms": 500,
+        "high_precision": true,
+        "description": "Speed over ground"
+      },
+      {
+        "path": "electrical.switches.navigation.port.state",
+        "period_ms": 2000,
+        "min_period_ms": 1000,
+        "high_precision": false,
+        "description": "Port navigation light switch state"
+      },
+      {
+        "path": "electrical.switches.navigation.starboard.state",
+        "period_ms": 2000,
+        "min_period_ms": 1000,
+        "high_precision": false,
+        "description": "Starboard navigation light switch state"
+      }
+    ]
+  },
+  "reconnection": {
+    "auto_reconnect_enabled": true,
+    "max_retries": 5,
+    "base_delay_ms": 1000,
+    "max_delay_ms": 30000,
+    "backoff_multiplier": 2.0,
+    "jitter_percent": 20,
+    "connection_timeout_ms": 15000,
+    "reset_on_success": true
+  },
+  "signalk_control": {
+    "enabled": true,
+    "server_host": "127.0.0.1",
+    "server_port": 3000,
+    "vessel_id": "self",
+    "timeout_ms": 5000,
+    "verify_ssl": false
+  }
+}

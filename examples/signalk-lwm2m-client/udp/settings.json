@@ -1,112 +1,148 @@
 {
-  "signalk": {
-    "host": "localhost",
-    "port": 3000,
+  "signalk_subscriptions": {
+    "server": {
+      "host": "127.0.0.1",
+      "port": 3000,
+      "path": "/signalk/v1/stream",
+      "subscribe_mode": "none"
+    },
     "subscriptions": [
       {
-        "_comment": "Core navigation data - available on most SignalK servers",
-        "path": "navigation.position.latitude",
-        "lwm2m_object": 6,
-        "lwm2m_instance": 0,
-        "lwm2m_resource": 0,
-        "period": 2000,
-        "minPeriod": 1000,
-        "maxAge": 10000
+        "path": "navigation.position",
+        "period_ms": 1000,
+        "min_period_ms": 500,
+        "high_precision": true,
+        "description": "Vessel position (latitude/longitude)"
       },
       {
-        "path": "navigation.position.longitude",
-        "lwm2m_object": 6,
-        "lwm2m_instance": 0,
-        "lwm2m_resource": 1,
-        "period": 2000,
-        "minPeriod": 1000,
-        "maxAge": 10000
-      }
-    ],
-    "_optional_subscriptions": [
-      {
-        "_comment": "Electrical data - only enable if you have battery monitoring",
-        "path": "electrical.batteries.house.voltage",
-        "lwm2m_object": 3305,
-        "lwm2m_instance": 0,
-        "lwm2m_resource": 5700,
-        "period": 5000,
-        "minPeriod": 2000,
-        "maxAge": 30000
+        "path": "navigation.speedOverGround",
+        "period_ms": 1000,
+        "min_period_ms": 500,
+        "high_precision": true,
+        "description": "Speed over ground"
       },
       {
-        "path": "electrical.batteries.engine.voltage",
-        "lwm2m_object": 3305,
-        "lwm2m_instance": 1,
-        "lwm2m_resource": 5700,
-        "period": 5000,
-        "minPeriod": 2000,
-        "maxAge": 30000
+        "path": "navigation.courseOverGroundTrue",
+        "period_ms": 1000,
+        "min_period_ms": 500,
+        "high_precision": false,
+        "description": "Course over ground (true)"
       },
       {
-        "path": "electrical.batteries.house.current",
-        "lwm2m_object": 3305,
-        "lwm2m_instance": 2,
-        "lwm2m_resource": 5700,
-        "period": 5000,
-        "minPeriod": 2000,
-        "maxAge": 30000
+        "path": "navigation.datetime",
+        "period_ms": 1000,
+        "min_period_ms": 500,
+        "high_precision": false,
+        "description": "Navigation timestamp"
       },
       {
-        "_comment": "Solar data - only enable if you have solar panel monitoring",
-        "path": "electrical.solar.power",
-        "lwm2m_object": 3305,
-        "lwm2m_instance": 10,
-        "lwm2m_resource": 5700,
-        "period": 10000,
-        "minPeriod": 5000,
-        "maxAge": 60000
+        "path": "navigation.gnss.methodQuality",
+        "period_ms": 2000,
+        "min_period_ms": 1000,
+        "high_precision": false,
+        "description": "GNSS fix quality"
       },
       {
-        "path": "electrical.solar.cumulativeEnergy",
-        "lwm2m_object": 3331,
-        "lwm2m_instance": 0,
-        "lwm2m_resource": 5805,
-        "period": 30000,
-        "minPeriod": 10000,
-        "maxAge": 300000
+        "path": "navigation.gnss.satellites",
+        "period_ms": 3000,
+        "min_period_ms": 1500,
+        "high_precision": false,
+        "description": "Number of satellites in use"
       },
       {
-        "_comment": "Load monitoring - only enable if you have individual circuit monitoring",
-        "path": "electrical.loads.house.power",
-        "lwm2m_object": 3331,
-        "lwm2m_instance": 2,
-        "lwm2m_resource": 5820,
-        "period": 10000,
-        "minPeriod": 5000,
-        "maxAge": 60000
+        "path": "navigation.gnss.antennaAltitude",
+        "period_ms": 3000,
+        "min_period_ms": 1500,
+        "high_precision": false,
+        "description": "GNSS antenna altitude"
       },
       {
-        "_comment": "Shore power - only enable if you have shore power monitoring",
-        "path": "electrical.shore.cumulativeEnergy",
-        "lwm2m_object": 3331,
-        "lwm2m_instance": 1,
-        "lwm2m_resource": 5805,
-        "period": 30000,
-        "minPeriod": 10000,
-        "maxAge": 300000
+        "path": "navigation.gnss.horizontalDilution",
+        "period_ms": 5000,
+        "min_period_ms": 2500,
+        "high_precision": false,
+        "description": "Horizontal dilution of precision"
       },
       {
-        "_comment": "Engine charging - only enable if you have alternator monitoring",
-        "path": "electrical.engine.cumulativeEnergy",
-        "lwm2m_object": 3331,
-        "lwm2m_instance": 3,
-        "lwm2m_resource": 5805,
-        "period": 30000,
-        "minPeriod": 10000,
-        "maxAge": 300000
+        "path": "navigation.gnss.differentialAge",
+        "period_ms": 5000,
+        "min_period_ms": 2500,
+        "high_precision": false,
+        "description": "Age of differential corrections"
+      },
+      {
+        "path": "navigation.gnss.differentialReference",
+        "period_ms": 5000,
+        "min_period_ms": 2500,
+        "high_precision": false,
+        "description": "Differential reference station ID"
+      },
+      {
+        "path": "environment.rpi.cpu.temperature",
+        "period_ms": 30000,
+        "min_period_ms": 15000,
+        "high_precision": false,
+        "description": "Raspberry Pi CPU temperature"
+      },
+      {
+        "path": "environment.rpi.memory.utilisation",
+        "period_ms": 30000,
+        "min_period_ms": 15000,
+        "high_precision": false,
+        "description": "Memory utilization"
+      },
+      {
+        "path": "environment.rpi.sd.utilisation",
+        "period_ms": 30000,
+        "min_period_ms": 15000,
+        "high_precision": false,
+        "description": "SD card utilization"
+      },
+      {
+        "path": "environment.rpi.cpu.utilisation",
+        "period_ms": 30000,
+        "min_period_ms": 15000,
+        "high_precision": false,
+        "description": "CPU utilization"
+      },
+      {
+        "path": "environment.rpi.cpu.core",
+        "period_ms": 30000,
+        "min_period_ms": 15000,
+        "high_precision": false,
+        "description": "Per-core CPU utilization"
+      },
+      {
+        "path": "network.interfaces",
+        "period_ms": 60000,
+        "min_period_ms": 30000,
+        "high_precision": false,
+        "description": "Network interface information"
+      },
+      {
+        "path": "electrical.batteries.house.capacity.stateOfCharge",
+        "period_ms": 30000,
+        "min_period_ms": 15000,
+        "high_precision": false,
+        "description": "House battery state of charge (percentage)"
+      },
+      {
+        "path": "electrical.batteries.engine.capacity.stateOfCharge",
+        "period_ms": 30000,
+        "min_period_ms": 15000,
+        "high_precision": false,
+        "description": "Engine battery state of charge (percentage)"
       }
     ]
   },
-  "lwm2m": {
-    "serverHost": "leshan.eclipseprojects.io",
-    "serverPort": 5683,
-    "endpointName": "MarineIoT-001",
-    "lifetime": 300
+  "reconnection": {
+    "auto_reconnect_enabled": true,
+    "max_retries": 0,
+    "base_delay_ms": 1000,
+    "max_delay_ms": 300000,
+    "backoff_multiplier": 2.0,
+    "jitter_percent": 20,
+    "connection_timeout_ms": 30000,
+    "reset_on_success": true
   }
 }

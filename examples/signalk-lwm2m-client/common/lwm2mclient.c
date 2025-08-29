@@ -806,8 +806,7 @@ void print_usage(void) {
     fprintf(stdout, "  -s HEXSTRING\tSet the device management or bootstrap server Pre-Shared-Key. If not set use none "
                     "secure mode\r\n");
 #endif
-    fprintf(stdout, "  -k\t\tEnable SignalK WebSocket client (requires settings.json configuration)\r\n");
-    fprintf(stdout, "  -f FILE\tSpecify path to SignalK settings.json file. Default: ./settings.json\r\n");
+    fprintf(stdout, "  -f FILE\tSpecify path to SignalK settings.json file (enables SignalK WebSocket client)\r\n");
     fprintf(stdout, "\r\n");
 }
 // START wakatiwai
@@ -1086,9 +1085,6 @@ int main(int argc, char *argv[]) {
                 print_usage();
                 return 0;
             }
-        case 'k':
-            signalk_enabled = true;
-            break;
         case 'f':
             opt++;
             if (opt >= argc) {
@@ -1096,6 +1092,7 @@ int main(int argc, char *argv[]) {
                 return 0;
             }
             settings_file = argv[opt];
+            signalk_enabled = true;  // Enable SignalK when settings file is provided
             break;
         default:
             print_usage();

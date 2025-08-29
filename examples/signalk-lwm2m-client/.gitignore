@@ -1,0 +1,14 @@
+# SignalK Authentication Tokens (keep secure)
+token.json
+**/token.json
+
+# Build artifacts
+build/
+*.o
+*.so
+*.a
+
+# Backup files
+*.backup
+*.bak
+*~
