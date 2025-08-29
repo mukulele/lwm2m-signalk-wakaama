@@ -9,6 +9,8 @@
 #include "bridge_object.h"
 #include "signalk_subscriptions.h"
 #include "signalk_hotreload.h"
+#include "signalk_control.h"
+#include "signalk_control.h"
 
 static struct lws_context *context;
 static struct lws *wsi;
@@ -215,14 +217,26 @@ int signalk_ws_start(const char *server, int port, const char *settings_file)
         printf("[SignalK] Warning: Hot-reload initialization failed\n");
     }
 
+    // Initialize SignalK control system for PUT commands
+    printf("[SignalK] Initializing SignalK control system...\n");
+    if (signalk_control_load_config(config_file)) {
+        printf("[SignalK] ✓ SignalK control system initialized\n");
+        
+        // Test connection to SignalK server (optional, non-blocking)
+        if (signalk_control_test_connection()) {
+            printf("[SignalK] ✓ SignalK HTTP API is accessible\n");
+        } else {
+            printf("[SignalK] ⚠ SignalK HTTP API not accessible (this is normal if server requires authentication)\n");
+        }
+    } else {
+        printf("[SignalK] Warning: SignalK control system initialization failed\n");
+        printf("[SignalK] LwM2M→SignalK control will not be available\n");
+    }
+
     // Check if we have any subscriptions
     if (signalk_subscription_count == 0) {
         printf("[SignalK] Warning: No subscriptions configured, SignalK data will not be received\n");
         printf("[SignalK] Please check settings.json for subscription configuration\n");
-    }
-    
-    if (signalk_subscription_count == 0) {
-        printf("[SignalK] Warning: No subscriptions configured, WebSocket connection will be receive-only\n");
     }
 
     // Reset subscription state
@@ -300,6 +314,14 @@ void signalk_ws_stop(void)
         lws_context_destroy(context);
         context = NULL;
     }
+    
+    // Cleanup SignalK control system
+    printf("[SignalK] Cleaning up SignalK control system...\n");
+    signalk_control_cleanup();
+    
+    // Cleanup hot-reload system
+    printf("[SignalK] Cleaning up hot-reload system...\n");
+    signalk_hotreload_stop_service();
     wsi = NULL;
     
     // Stop hot-reload service and clean up

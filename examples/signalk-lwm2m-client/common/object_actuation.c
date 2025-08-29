@@ -28,6 +28,7 @@
 
 #include "liblwm2m.h"
 #include "bridge_object.h"
+#include "../websocket_client/signalk_control.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,6 +49,24 @@ typedef struct _actuation_instance_
     char     applicationType[64];         // Application description
     time_t   timestamp;                   // Last update timestamp
 } actuation_instance_t;
+
+/**
+ * Map actuation instance ID to SignalK path
+ * Based on the documented switch control instances in README.md
+ */
+static const char* get_signalk_path(uint16_t instance_id) {
+    switch (instance_id) {
+        case 0: return "electrical/switches/navigation/lights";
+        case 1: return "electrical/switches/anchor/light";
+        case 2: return "electrical/switches/bilgePump/main";
+        case 3: return "electrical/switches/freshWaterPump";
+        case 4: return "electrical/switches/cabin/lights";
+        case 5: return "electrical/switches/windlass";
+        default: 
+            printf("[Actuation] Warning: Unknown instance %d, using generic path\n", instance_id);
+            return "electrical/switches/unknown";
+    }
+}
 
 // Forward declarations
 static uint8_t prv_delete(lwm2m_context_t * contextP, uint16_t instanceId, lwm2m_object_t * objectP);
@@ -175,8 +194,19 @@ static uint8_t prv_write(lwm2m_context_t * contextP,
                         state_changed = true;
                         printf("[Actuation] Instance %d switch %s\n", instanceId, newState ? "ON" : "OFF");
                         
-                        // TODO: Send SignalK PUT command to actually control the switch
-                        // This would integrate with your SignalK client to send control commands
+                        // Send SignalK PUT command to control the switch
+                        const char* signalk_path = get_signalk_path(instanceId);
+                        signalk_put_result_t result = signalk_control_switch(signalk_path, newState);
+                        
+                        if (result == SIGNALK_PUT_SUCCESS) {
+                            printf("[Actuation] ✓ SignalK PUT successful: %s = %s\n", 
+                                   signalk_path, newState ? "ON" : "OFF");
+                        } else {
+                            printf("[Actuation] ✗ SignalK PUT failed: %s (%s)\n", 
+                                   signalk_path, signalk_control_error_string(result));
+                            // Note: We don't fail the LwM2M operation if SignalK PUT fails
+                            // The LwM2M state is updated, but the physical control may not respond
+                        }
                     }
                 }
                 else
@@ -200,7 +230,18 @@ static uint8_t prv_write(lwm2m_context_t * contextP,
                         state_changed = true;
                         printf("[Actuation] Instance %d dimmer set to %d%%\n", instanceId, targetP->dimmer);
                         
-                        // TODO: Send SignalK PUT command for dimmer control
+                        // Send SignalK PUT command for dimmer control
+                        const char* signalk_path = get_signalk_path(instanceId);
+                        signalk_put_result_t result = signalk_control_dimmer(signalk_path, targetP->dimmer);
+                        
+                        if (result == SIGNALK_PUT_SUCCESS) {
+                            printf("[Actuation] ✓ SignalK PUT successful: %s dimmer = %d%%\n", 
+                                   signalk_path, targetP->dimmer);
+                        } else {
+                            printf("[Actuation] ✗ SignalK PUT failed: %s dimmer (%s)\n", 
+                                   signalk_path, signalk_control_error_string(result));
+                            // Note: We don't fail the LwM2M operation if SignalK PUT fails
+                        }
                     }
                 }
                 else

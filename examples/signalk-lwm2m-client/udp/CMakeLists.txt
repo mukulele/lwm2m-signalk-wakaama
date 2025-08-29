@@ -43,6 +43,8 @@ target_sources(
             ../websocket_client/signalk_subscriptions.h
             ../websocket_client/signalk_hotreload.c
             ../websocket_client/signalk_hotreload.h
+            ../websocket_client/signalk_control.c
+            ../websocket_client/signalk_control.h
 )
 
 target_include_directories(signalk-lwm2m-client PRIVATE ../common ../websocket_client)
@@ -51,18 +53,21 @@ target_include_directories(signalk-lwm2m-client PRIVATE ../common ../websocket_c
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
 pkg_check_modules(CJSON REQUIRED libcjson)
+pkg_check_modules(CURL REQUIRED libcurl)
 
 target_link_libraries(signalk-lwm2m-client PRIVATE 
     wakaama_static 
     gps 
     ${LIBWEBSOCKETS_LIBRARIES}
     ${CJSON_LIBRARIES}
+    ${CURL_LIBRARIES}
     pthread
 )
 
 target_include_directories(signalk-lwm2m-client PRIVATE 
     ${LIBWEBSOCKETS_INCLUDE_DIRS}
     ${CJSON_INCLUDE_DIRS}
+    ${CURL_INCLUDE_DIRS}
 )
 
 enable_testing()
@@ -83,4 +88,24 @@ target_link_libraries(test-hotreload PRIVATE
 
 target_include_directories(test-hotreload PRIVATE 
     ${CJSON_INCLUDE_DIRS}
+)
+
+# Add SignalK control test executable
+add_executable(test-signalk-control 
+    ../websocket_client/test_signalk_control.c
+    ../websocket_client/signalk_subscriptions.c
+    ../websocket_client/signalk_control.c
+)
+
+target_include_directories(test-signalk-control PRIVATE ../websocket_client ../common)
+
+target_link_libraries(test-signalk-control PRIVATE 
+    ${CJSON_LIBRARIES}
+    ${CURL_LIBRARIES}
+    pthread
+)
+
+target_include_directories(test-signalk-control PRIVATE 
+    ${CJSON_INCLUDE_DIRS}
+    ${CURL_INCLUDE_DIRS}
 )

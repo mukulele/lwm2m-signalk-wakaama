@@ -123,8 +123,8 @@
 ## 🌐 Phase 3: Advanced Features (6-8 weeks)
 
 ### Enhanced Bi-directional Communication
-- [ ] **Advanced Control Operations**
-  - [ ] SignalK PUT command integration for vessel system control
+- [x] **Advanced Control Operations** ✅ **COMPLETED**
+  - [x] SignalK PUT command integration for vessel system control ✅ **NEW**
   - [ ] Security framework for remote commands
   - [ ] Audit trail for all write operations
   - [ ] Command confirmation and error handling
@@ -229,6 +229,7 @@
 - **Bridge Registry**: Expanded to 128 mappings with 19+ active SignalK integrations
 - **Bidirectional Communication**: Full read/write support for vessel system control
 - **Hot-Reload System**: Real-time configuration updates without restart ✨ NEW
+- **SignalK PUT Integration**: HTTP-based vessel control commands via libcurl ✨ NEW
 - **Memory Optimization**: Reduced baseline memory footprint
 - **Protocol Compliance**: Full SignalK v1.x WebSocket specification
 - **Code Quality**: Modular architecture with clean interfaces
