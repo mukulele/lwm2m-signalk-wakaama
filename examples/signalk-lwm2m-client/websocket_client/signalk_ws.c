@@ -8,6 +8,7 @@
 
 #include "bridge_object.h"
 #include "signalk_subscriptions.h"
+#include "signalk_hotreload.h"
 
 static struct lws_context *context;
 static struct lws *wsi;
@@ -197,6 +198,23 @@ int signalk_ws_start(const char *server, int port, const char *settings_file)
         return -1;
     }
 
+    // Initialize hot-reload functionality
+    printf("[SignalK] Initializing configuration hot-reload for %s...\n", config_file);
+    if (signalk_hotreload_init(config_file, 2000)) {
+        printf("[SignalK] ✓ Hot-reload enabled (checking every 2s)\n");
+        printf("[SignalK] You can now edit %s and changes will be applied automatically\n", config_file);
+        
+        // Set callback for configuration changes (optional)
+        // signalk_hotreload_set_callback(my_config_change_handler);
+        
+        // Start the hot-reload service thread
+        if (!signalk_hotreload_start_service()) {
+            printf("[SignalK] Warning: Failed to start hot-reload service thread\n");
+        }
+    } else {
+        printf("[SignalK] Warning: Hot-reload initialization failed\n");
+    }
+
     // Check if we have any subscriptions
     if (signalk_subscription_count == 0) {
         printf("[SignalK] Warning: No subscriptions configured, SignalK data will not be received\n");
@@ -283,6 +301,11 @@ void signalk_ws_stop(void)
         context = NULL;
     }
     wsi = NULL;
+    
+    // Stop hot-reload service and clean up
+    printf("[SignalK] Stopping hot-reload service...\n");
+    signalk_hotreload_stop_service();
+    signalk_hotreload_cleanup();
     
     // Clean up configuration
     signalk_free_config();

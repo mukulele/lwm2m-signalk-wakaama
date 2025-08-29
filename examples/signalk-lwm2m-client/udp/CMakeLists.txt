@@ -41,6 +41,8 @@ target_sources(
             ../websocket_client/signalk_ws.h
             ../websocket_client/signalk_subscriptions.c
             ../websocket_client/signalk_subscriptions.h
+            ../websocket_client/signalk_hotreload.c
+            ../websocket_client/signalk_hotreload.h
 )
 
 target_include_directories(signalk-lwm2m-client PRIVATE ../common ../websocket_client)
@@ -64,3 +66,21 @@ target_include_directories(signalk-lwm2m-client PRIVATE
 )
 
 enable_testing()
+
+# Add hot-reload test executable
+add_executable(test-hotreload 
+    ../websocket_client/test_hotreload.c
+    ../websocket_client/signalk_subscriptions.c
+    ../websocket_client/signalk_hotreload.c
+)
+
+target_include_directories(test-hotreload PRIVATE ../websocket_client ../common)
+
+target_link_libraries(test-hotreload PRIVATE 
+    ${CJSON_LIBRARIES}
+    pthread
+)
+
+target_include_directories(test-hotreload PRIVATE 
+    ${CJSON_INCLUDE_DIRS}
+)

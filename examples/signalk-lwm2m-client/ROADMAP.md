@@ -108,8 +108,8 @@
   - [ ] Historical data buffering for reliability
 
 ### Configuration Evolution
-- [ ] **Advanced Configuration**
-  - [ ] Hot-reload of settings.json without restart
+- [x] **Advanced Configuration** ✨ NEW
+  - [x] Hot-reload of settings.json without restart ✅ **COMPLETED**
   - [ ] Environment-specific configuration inheritance
   - [ ] Subscription path templating and variables
   - [ ] Configuration validation and schema checking
@@ -228,6 +228,7 @@
 - **Object Architecture**: 10 LwM2M objects with 4 marine-specific implementations (3300, 3305, 3306, 3331)
 - **Bridge Registry**: Expanded to 128 mappings with 19+ active SignalK integrations
 - **Bidirectional Communication**: Full read/write support for vessel system control
+- **Hot-Reload System**: Real-time configuration updates without restart ✨ NEW
 - **Memory Optimization**: Reduced baseline memory footprint
 - **Protocol Compliance**: Full SignalK v1.x WebSocket specification
 - **Code Quality**: Modular architecture with clean interfaces
