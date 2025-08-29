@@ -30,6 +30,8 @@ Release
 DebugServer
 ReleaseServer
 cmake_install.cmake
+build/
+build-*/
 core/CMakeCache.txt
 core/CMakeFiles
 core/Makefile
