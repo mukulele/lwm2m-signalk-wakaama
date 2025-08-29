@@ -45,6 +45,8 @@ target_sources(
             ../websocket_client/signalk_hotreload.h
             ../websocket_client/signalk_control.c
             ../websocket_client/signalk_control.h
+            ../websocket_client/signalk_reconnect.c
+            ../websocket_client/signalk_reconnect.h
 )
 
 target_include_directories(signalk-lwm2m-client PRIVATE ../common ../websocket_client)
@@ -108,4 +110,22 @@ target_link_libraries(test-signalk-control PRIVATE
 target_include_directories(test-signalk-control PRIVATE 
     ${CJSON_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
+)
+
+# Add SignalK reconnection test executable
+add_executable(test-reconnect 
+    ../websocket_client/test_reconnect.c
+    ../websocket_client/signalk_subscriptions.c
+    ../websocket_client/signalk_reconnect.c
+)
+
+target_include_directories(test-reconnect PRIVATE ../websocket_client ../common)
+
+target_link_libraries(test-reconnect PRIVATE 
+    ${CJSON_LIBRARIES}
+    pthread
+)
+
+target_include_directories(test-reconnect PRIVATE 
+    ${CJSON_INCLUDE_DIRS}
 )

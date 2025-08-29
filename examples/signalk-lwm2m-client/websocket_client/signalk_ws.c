@@ -10,13 +10,15 @@
 #include "signalk_subscriptions.h"
 #include "signalk_hotreload.h"
 #include "signalk_control.h"
-#include "signalk_control.h"
+#include "signalk_reconnect.h"
 
 static struct lws_context *context;
 static struct lws *wsi;
 static pthread_t ws_thread;
 static int running = 1;
 static int subscription_sent = 0;
+static char server_address[256] = "demo.signalk.org";
+static int server_port = 3000;
 
 static int callback_signalk(struct lws *wsi,
                             enum lws_callback_reasons reason,
@@ -28,6 +30,7 @@ static int callback_signalk(struct lws *wsi,
         printf("[SignalK] Connected to server with subscribe=none - sending selective subscription\n");
         signalk_log_subscription_status();
         subscription_sent = 0;
+        signalk_reconnect_on_connect();  // Notify reconnection system of success
         lws_callback_on_writable(wsi);
         break;
 
@@ -147,10 +150,14 @@ static int callback_signalk(struct lws *wsi,
 
     case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
         printf("[SignalK] Connection error\n");
+        wsi = NULL;  // Reset connection pointer
+        signalk_reconnect_on_disconnect();
         break;
 
     case LWS_CALLBACK_CLOSED:
         printf("[SignalK] Disconnected\n");
+        wsi = NULL;  // Reset connection pointer
+        signalk_reconnect_on_disconnect();
         break;
 
     default:
@@ -172,13 +179,40 @@ static struct lws_protocols protocols[] = {
 
 static void *ws_loop(void *arg)
 {
-    printf("[SignalK] WebSocket service loop started\n");
+    printf("[SignalK] WebSocket service loop started with automatic reconnection\n");
+    
     while (running && context)
     {
+        // Service existing connections
         if (lws_service(context, 100) < 0) {
-            printf("[SignalK] WebSocket service error, breaking loop\n");
-            break;
+            printf("[SignalK] WebSocket service error, checking reconnection\n");
         }
+        
+        // Check if we need to attempt reconnection
+        if (signalk_reconnect_is_enabled() && !wsi && signalk_reconnect_should_retry()) {
+            printf("[SignalK] Attempting automatic reconnection...\n");
+            
+            struct lws_client_connect_info ccinfo;
+            memset(&ccinfo, 0, sizeof(ccinfo));
+            ccinfo.context = context;
+            ccinfo.address = server_address;
+            ccinfo.port = server_port;
+            ccinfo.path = "/signalk/v1/stream";
+            ccinfo.host = ccinfo.address;
+            ccinfo.origin = ccinfo.address;
+            ccinfo.protocol = protocols[0].name;
+            
+            wsi = lws_client_connect_via_info(&ccinfo);
+            if (!wsi) {
+                printf("[SignalK] Reconnection attempt failed\n");
+                signalk_reconnect_attempt(server_address, server_port);
+            } else {
+                printf("[SignalK] Reconnection attempt initiated\n");
+            }
+        }
+        
+        // Small delay to prevent busy waiting
+        usleep(10000); // 10ms
     }
     printf("[SignalK] WebSocket service loop ended\n");
     return NULL;
@@ -189,8 +223,21 @@ int signalk_ws_start(const char *server, int port, const char *settings_file)
     struct lws_context_creation_info info;
     struct lws_client_connect_info ccinfo;
 
+    // Store server info for reconnection
+    strncpy(server_address, server, sizeof(server_address) - 1);
+    server_address[sizeof(server_address) - 1] = '\0';
+    server_port = port;
+
     // Use provided settings file path, or default to current directory
     const char *config_file = settings_file ? settings_file : "settings.json";
+    
+    // Initialize reconnection system
+    printf("[SignalK] Initializing automatic reconnection system...\n");
+    if (!signalk_reconnect_load_config(config_file)) {
+        printf("[SignalK] Warning: Failed to load reconnection config, using defaults\n");
+        signalk_reconnect_config_t default_config = signalk_reconnect_get_default_config();
+        signalk_reconnect_init(&default_config);
+    }
     
     // Load configuration from specified settings file
     if (!signalk_load_config_from_file(config_file)) {
@@ -318,6 +365,10 @@ void signalk_ws_stop(void)
     // Cleanup SignalK control system
     printf("[SignalK] Cleaning up SignalK control system...\n");
     signalk_control_cleanup();
+    
+    // Cleanup reconnection system
+    printf("[SignalK] Cleaning up reconnection system...\n");
+    signalk_reconnect_cleanup();
     
     // Cleanup hot-reload system
     printf("[SignalK] Cleaning up hot-reload system...\n");

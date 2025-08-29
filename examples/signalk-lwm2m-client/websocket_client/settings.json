@@ -120,5 +120,15 @@
         "description": "Network interface information"
       }
     ]
+  },
+  "reconnection": {
+    "auto_reconnect_enabled": true,
+    "max_retries": 0,
+    "base_delay_ms": 1000,
+    "max_delay_ms": 300000,
+    "backoff_multiplier": 2.0,
+    "jitter_percent": 20,
+    "connection_timeout_ms": 30000,
+    "reset_on_success": true
   }
 }
