@@ -27,15 +27,23 @@ target_sources(
             ../common/object_security.c
             ../common/object_server.c
             ../common/object_test.c
-            ../common/object_3300.c
+            ../common/object_generic_sensor.c
+            ../common/object_power_measurement.c
+            ../common/object_power_measurement.h
+            ../common/object_energy.c
+            ../common/object_energy.h
+            ../common/object_actuation.c
+            ../common/object_actuation.h
             ../common/bridge_object.c
             ../common/bridge_object.h
             ../common/system_api.c
             ../websocket_client/signalk_ws.c
             ../websocket_client/signalk_ws.h
+            ../websocket_client/signalk_subscriptions.c
+            ../websocket_client/signalk_subscriptions.h
 )
 
-target_include_directories(signalk-lwm2m-client PRIVATE ../base64 ../common ../websocket_client)
+target_include_directories(signalk-lwm2m-client PRIVATE ../common ../websocket_client)
 
 # Find required libraries for WebSocket support
 find_package(PkgConfig REQUIRED)

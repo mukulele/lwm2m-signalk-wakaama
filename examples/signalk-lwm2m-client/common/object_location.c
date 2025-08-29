@@ -48,15 +48,12 @@
  *velocity.                                 |
  */
 
- #include <gps.h>   // GPSD Client Library
- #include <unistd.h> // For sleep()
- 
 #include "liblwm2m.h"
+#include "bridge_object.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <time.h>
 
 #ifdef LWM2M_CLIENT_MODE
@@ -90,11 +87,43 @@ typedef struct {
 } location_data_t;
 
 /**
-implementation for all read-able resources
+implementation for all read-able resources with SignalK integration
 */
 static uint8_t prv_res2tlv(lwm2m_data_t *dataP, location_data_t *locDataP) {
     //-------------------------------------------------------------------- JH --
     uint8_t ret = COAP_205_CONTENT;
+    
+    // Try to get fresh data from SignalK bridge for each read
+    const char *lat_str = bridge_read(LWM2M_LOCATION_OBJECT_ID, 0, RES_M_LATITUDE);
+    const char *lon_str = bridge_read(LWM2M_LOCATION_OBJECT_ID, 0, RES_M_LONGITUDE);
+    const char *speed_str = bridge_read(LWM2M_LOCATION_OBJECT_ID, 0, RES_O_SPEED);
+    const char *alt_str = bridge_read(LWM2M_LOCATION_OBJECT_ID, 0, RES_O_ALTITUDE);
+    
+    // Update location data with fresh SignalK values if available
+    if (lat_str && strlen(lat_str) > 0) {
+        float new_lat = atof(lat_str);
+        if (new_lat >= -90.0 && new_lat <= 90.0) {
+            locDataP->latitude = new_lat;
+        }
+    }
+    if (lon_str && strlen(lon_str) > 0) {
+        float new_lon = atof(lon_str);
+        if (new_lon >= -180.0 && new_lon <= 180.0) {
+            locDataP->longitude = new_lon;
+        }
+    }
+    if (speed_str && strlen(speed_str) > 0) {
+        locDataP->speed = atof(speed_str);
+    }
+    if (alt_str && strlen(alt_str) > 0) {
+        locDataP->altitude = atof(alt_str);
+    }
+    
+    // Update timestamp to current time when we have fresh data
+    if (lat_str || lon_str || speed_str || alt_str) {
+        locDataP->timestamp = time(NULL);
+    }
+    
     switch (dataP->id) // location resourceId
     {
     case RES_M_LATITUDE:
@@ -235,52 +264,6 @@ void location_setVelocity(lwm2m_object_t *locationObj, uint16_t bearing, uint16_
     pData->velocity[3] = horizontalSpeed & 0xff;
     pData->velocity[4] = speedUncertainty;
 }
-/**
- * Fetches GPS data (latitude, longitude, timestamp, speed) from the gpsd daemon.
- * @param latitude Pointer to store latitude.
- * @param longitude Pointer to store longitude.
- * @param timestamp Pointer to store timestamp (seconds since 1970).
- * @param speed Pointer to store speed (m/s).
- * @return 1 if successful, 0 if no fix, -1 if gpsd connection fails.
- */
-int get_gps_coordinates(double *latitude, double *longitude, time_t *timestamp, float *speed) {
-    struct gps_data_t gps_data;
-
-    // Connect to gpsd
-    if (gps_open("localhost", "2947", &gps_data) != 0) {
-        fprintf(stderr, "Failed to connect to gpsd: %s\n", gps_errstr(errno));
-        return -1;
-    }
-
-    // Enable JSON mode
-    gps_stream(&gps_data, WATCH_ENABLE, NULL);
-
-    // Wait for a GPS fix (timeout after 5 seconds)
-    for (int i = 0; i < 5; i++) {
-        if (gps_waiting(&gps_data, 1000000)) { // 1 second wait
-            if (gps_read(&gps_data, NULL, 0) == -1) {
-                fprintf(stderr, "GPS read error: %s\n", gps_errstr(errno));
-            } else {
-                if (gps_data.fix.mode >= MODE_2D) { // Valid fix
-                    *latitude = gps_data.fix.latitude;
-                    *longitude = gps_data.fix.longitude;
-                    *timestamp = (time_t)gps_data.fix.time.tv_sec; // Convert GPSD timestamp
-                    *speed = (float)gps_data.fix.speed; // Speed in m/s
-
-                    gps_stream(&gps_data, WATCH_DISABLE, NULL);
-                    gps_close(&gps_data);
-                    return 1; // Success
-                }
-            }
-        }
-        sleep(1); // Wait before retrying
-    }
-
-    gps_stream(&gps_data, WATCH_DISABLE, NULL);
-    gps_close(&gps_data);
-    return 0; // No fix
-}
-
 
 /**
  * A convenience function to set the location coordinates with its timestamp.
@@ -305,43 +288,47 @@ int get_gps_coordinates(double *latitude, double *longitude, time_t *timestamp, 
 }
 */
 
-void location_setLocationAtTime(lwm2m_object_t *locationObj, float latitude, float longitude, float altitude, uint64_t timestamp) {
+/**
+ * A convenience function to set the location coordinates with its timestamp.
+ * Enhanced with SignalK integration.
+ * @param locationObj location object reference (to be casted!)
+ * @param latitude  the latitude value.
+ * @param longitude the longitude value.
+ * @param altitude  the altitude value.
+ * @param timestamp the related timestamp. Seconds since 1970.
+ */
+void location_setLocationAtTime(lwm2m_object_t *locationObj, float latitude, float longitude, float altitude,
+                                uint64_t timestamp) {
+    //-------------------------------------------------------------------- JH --
     location_data_t *pData = locationObj->userData;
-    double gps_lat = 0.0, gps_lon = 0.0;
-    time_t gps_time = 0;
-    float gps_speed = 0.0;
 
-    // Get live GPS data
-    int gps_status = get_gps_coordinates(&gps_lat, &gps_lon, &gps_time, &gps_speed);
-    if (gps_status == 1) {
-        pData->latitude = (float)gps_lat;
-        pData->longitude = (float)gps_lon;
-        pData->timestamp = gps_time;
-        pData->speed = gps_speed;
-    } else {
-        fprintf(stderr, "GPS unavailable, using last known coordinates.\n");
-    }
-
-    pData->altitude = altitude;   // Keep altitude from parameter or GPS if available
+    pData->latitude = latitude;
+    pData->longitude = longitude;
+    pData->altitude = altitude;
+    pData->timestamp = timestamp;
 }
 
 
 
 /**
- * This function creates the LwM2M Location.
+ * This function creates the LwM2M Location object with SignalK integration.
  * @return gives back allocated LwM2M data object structure pointer. On error,
  * NULL value is returned.
  */
 lwm2m_object_t *get_object_location(void) {
+    //-------------------------------------------------------------------- JH --
     lwm2m_object_t *locationObj;
 
     locationObj = (lwm2m_object_t *)lwm2m_malloc(sizeof(lwm2m_object_t));
     if (NULL != locationObj) {
         memset(locationObj, 0, sizeof(lwm2m_object_t));
 
+        // It assigns its unique ID
+        // The 6 is the standard ID for the optional object "Location".
         locationObj->objID = LWM2M_LOCATION_OBJECT_ID;
-        locationObj->instanceList = (lwm2m_list_t *)lwm2m_malloc(sizeof(lwm2m_list_t));
 
+        // and its unique instance
+        locationObj->instanceList = (lwm2m_list_t *)lwm2m_malloc(sizeof(lwm2m_list_t));
         if (NULL != locationObj->instanceList) {
             memset(locationObj->instanceList, 0, sizeof(lwm2m_list_t));
         } else {
@@ -349,26 +336,32 @@ lwm2m_object_t *get_object_location(void) {
             return NULL;
         }
 
+        // And the private function that will access the object.
+        // Those function will be called when a read query is made by the server.
+        // In fact the library don't need to know the resources of the object, only the server does.
         locationObj->readFunc = prv_location_read;
         locationObj->userData = lwm2m_malloc(sizeof(location_data_t));
 
+        // initialize private data structure containing the needed variables
         if (NULL != locationObj->userData) {
             location_data_t *data = (location_data_t *)locationObj->userData;
-            double gps_lat = 0.0, gps_lon = 0.0;
-            time_t gps_time = 0;
-            float gps_speed = 0.0;
-
-            if (get_gps_coordinates(&gps_lat, &gps_lon, &gps_time, &gps_speed) == 1) {
-                data->latitude = (float)gps_lat;
-                data->longitude = (float)gps_lon;
-                data->timestamp = gps_time;
-                data->speed = gps_speed;
-            } else {
-                data->latitude = 0.0; 
-                data->longitude = 0.0;
-                data->timestamp = time(NULL);
-                data->speed = 0.0;
-            }
+            
+            // Register SignalK bridge mappings for location data
+            bridge_register(LWM2M_LOCATION_OBJECT_ID, 0, RES_M_LATITUDE, "navigation.position.latitude");
+            bridge_register(LWM2M_LOCATION_OBJECT_ID, 0, RES_M_LONGITUDE, "navigation.position.longitude");
+            bridge_register(LWM2M_LOCATION_OBJECT_ID, 0, RES_O_SPEED, "navigation.speedOverGround");
+            bridge_register(LWM2M_LOCATION_OBJECT_ID, 0, RES_O_ALTITUDE, "navigation.gnss.antennaAltitude");
+            
+            // Initialize with default values (will be updated from SignalK)
+            data->latitude = 48.80782;  // Initial position from SignalK sample
+            data->longitude = 9.527745;
+            data->altitude = 273.66;     // From SignalK GNSS antenna altitude
+            data->radius = 10.0;         // 10m GPS accuracy
+            location_setVelocity(locationObj, 0, 0, 255); // 255: speedUncertainty not supported!
+            data->timestamp = time(NULL);
+            data->speed = 0.0;
+            
+            printf("[Location] Initialized with SignalK bridge mappings\n");
         } else {
             lwm2m_free(locationObj);
             locationObj = NULL;

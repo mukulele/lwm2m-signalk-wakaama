@@ -60,6 +60,9 @@
 #include "commandline.h"
 #include "liblwm2m.h"
 #include "bridge_object.h"
+#include "object_power_measurement.h"
+#include "object_energy.h"
+#include "object_actuation.h"
 #include "../websocket_client/signalk_ws.h"
 #ifdef WITH_TINYDTLS
 #include "tinydtls/connection.h"
@@ -92,7 +95,7 @@
 int g_reboot = 0;
 static int g_quit = 0;
 
-#define OBJ_COUNT 6
+#define OBJ_COUNT 10
 lwm2m_object_t *objArray[OBJ_COUNT];
 
 // only backup security and server objects
@@ -569,61 +572,6 @@ syntax_error:
 }
 #endif
 
-static void prv_test_observe(lwm2m_context_t *lwm2mH, char *buffer, void *user_data) {
-    lwm2m_uri_t uri;
-    int result;
-    
-    (void)buffer;   /* unused */
-    (void)user_data; /* unused */
-    
-    // Force a battery level change to trigger observation notification
-    fprintf(stdout, "[OBSERVE] Forcing battery level change to test observations\r\n");
-    
-    // Trigger battery resource change (Device Object /3/0/9)
-    result = lwm2m_stringToUri("/3/0/9", 6, &uri);
-    if (result > 0) {
-        fprintf(stdout, "[OBSERVE] Triggering notification for /3/0/9 (Battery Level)\r\n");
-        lwm2m_resource_value_changed(lwm2mH, &uri);
-    }
-    
-    // Also trigger current time change (Device Object /3/0/13)
-    result = lwm2m_stringToUri("/3/0/13", 7, &uri);
-    if (result > 0) {
-        fprintf(stdout, "[OBSERVE] Triggering notification for /3/0/13 (Current Time)\r\n");
-        lwm2m_resource_value_changed(lwm2mH, &uri);
-    }
-    
-    fprintf(stdout, "[OBSERVE] Test notifications sent - check for observe responses\r\n");
-}
-
-static void update_battery_level(lwm2m_context_t *context) {
-    static time_t next_change_time = 0;
-    time_t tv_sec;
-
-    tv_sec = lwm2m_gettime();
-    if (tv_sec < 0)
-        return;
-
-    if (next_change_time < tv_sec) {
-        char value[15];
-        int valueLength;
-        lwm2m_uri_t uri;
-        int level = rand() % 100; // NOSONAR
-
-        if (0 > level)
-            level = -level;
-        if (lwm2m_stringToUri("/3/0/9", 6, &uri)) {
-            valueLength = sprintf(value, "%d", level); // NOSONAR
-            fprintf(stderr, "New Battery Level: %d\n", level);
-            handle_value_changed(context, &uri, value, valueLength);
-        }
-        level = rand() % 20; // NOSONAR
-        if (0 > level)
-            level = -level;
-        next_change_time = tv_sec + level + 10;
-    }
-}
-
 static void prv_add(lwm2m_context_t *lwm2mH, char *buffer, void *user_data) {
     lwm2m_object_t *objectP;
     int res;
@@ -849,7 +797,6 @@ void print_usage(void) {
     fprintf(stdout, "  -4\t\tUse IPv4 connection. Default: IPv6 connection\r\n");
     fprintf(stdout, "  -t TIME\tSet the lifetime of the Client. Default: 300\r\n");
     fprintf(stdout, "  -b\t\tBootstrap requested.\r\n");
-    fprintf(stdout, "  -c\t\tChange battery level over time.\r\n");
     fprintf(stdout, "  -S BYTES\tCoAP block size. Options: 16, 32, 64, 128, 256, 512, 1024. Default: %" PRIu16 "\r\n",
             (uint16_t)LWM2M_COAP_DEFAULT_BLOCK_SIZE);
 #ifdef WITH_TINYDTLS
@@ -859,9 +806,8 @@ void print_usage(void) {
     fprintf(stdout, "  -s HEXSTRING\tSet the device management or bootstrap server Pre-Shared-Key. If not set use none "
                     "secure mode\r\n");
 #endif
-    fprintf(stdout, "  -k\t\tEnable SignalK WebSocket client with default settings (localhost:3000)\r\n");
-    fprintf(stdout, "  -K HOST\tSet SignalK server hostname and enable WebSocket client. Default: localhost\r\n");
-    fprintf(stdout, "  -P PORT\tSet SignalK server port and enable WebSocket client. Default: 3000\r\n");
+    fprintf(stdout, "  -k\t\tEnable SignalK WebSocket client (requires settings.json configuration)\r\n");
+    fprintf(stdout, "  -f FILE\tSpecify path to SignalK settings.json file. Default: ./settings.json\r\n");
     fprintf(stdout, "\r\n");
 }
 // START wakatiwai
@@ -978,17 +924,15 @@ int main(int argc, char *argv[]) {
     const char *serverPort = LWM2M_STANDARD_PORT_STR;
     const char *name = "testlwm2mclient";
     int lifetime = 300;
-    int batterylevelchanging = 0;
     time_t reboot_time = 0;
     int opt;
     bool bootstrapRequested = false;
     bool serverPortChanged = false;
 
     // SignalK WebSocket parameters
-    const char *signalk_server = "localhost";
-    int signalk_port = 3000;
     bool signalk_enabled = false;
     bool signalk_started = false;
+    const char *settings_file = NULL;
 
 #ifdef LWM2M_BOOTSTRAP
     lwm2m_client_state_t previousState = STATE_INITIAL;
@@ -1043,7 +987,6 @@ int main(int argc, char *argv[]) {
          prv_object_dump, NULL},
         {"add", "Add support of object 31024", NULL, prv_add, NULL},
         {"rm", "Remove support of object 31024", NULL, prv_remove, NULL},
-        {"testobs", "Trigger battery level change for observation testing", NULL, prv_test_observe, NULL},
         {"quit", "Quit the client gracefully.", NULL, prv_quit, NULL},
         {"^C", "Quit the client abruptly (without sending a de-register message).", NULL, NULL, NULL},
 
@@ -1063,9 +1006,6 @@ int main(int argc, char *argv[]) {
             bootstrapRequested = true;
             if (!serverPortChanged)
                 serverPort = LWM2M_BSSERVER_PORT_STR;
-            break;
-        case 'c':
-            batterylevelchanging = 1;
             break;
         case 't':
             opt++;
@@ -1149,26 +1089,13 @@ int main(int argc, char *argv[]) {
         case 'k':
             signalk_enabled = true;
             break;
-        case 'K':
+        case 'f':
             opt++;
             if (opt >= argc) {
                 print_usage();
                 return 0;
             }
-            signalk_server = argv[opt];
-            signalk_enabled = true;
-            break;
-        case 'P':
-            opt++;
-            if (opt >= argc) {
-                print_usage();
-                return 0;
-            }
-            if (1 != sscanf(argv[opt], "%d", &signalk_port)) {
-                print_usage();
-                return 0;
-            }
-            signalk_enabled = true;
+            settings_file = argv[opt];
             break;
         default:
             print_usage();
@@ -1265,21 +1192,43 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    objArray[5] = get_test_object();
-    if (NULL == objArray[5]) {
-        fprintf(stderr, "Failed to create test object\r\n");
-        return -1;
-    }
-
     objArray[5] = get_object_conn_m();
     if (NULL == objArray[5]) {
         fprintf(stderr, "Failed to create connectivity monitoring object\r\n");
         return -1;
     }
 
+    // Add Generic Sensor Object (3300) for environmental data
+    objArray[6] = get_object_generic_sensor("environment.temperature", "C");
+    if (NULL == objArray[6]) {
+        fprintf(stderr, "Failed to create generic sensor object\r\n");
+        return -1;
+    }
+
+    // Add Power Measurement Object (3305) for electrical monitoring
+    objArray[7] = get_power_measurement_object();
+    if (NULL == objArray[7]) {
+        fprintf(stderr, "Failed to create power measurement object\r\n");
+        return -1;
+    }
+
+    // Add Energy Object (3331) for cumulative energy tracking
+    objArray[8] = get_energy_object();
+    if (NULL == objArray[8]) {
+        fprintf(stderr, "Failed to create energy object\r\n");
+        return -1;
+    }
+
+    // Add Actuation Object (3306) for switch/relay control
+    objArray[9] = get_actuation_object();
+    if (NULL == objArray[9]) {
+        fprintf(stderr, "Failed to create actuation object\r\n");
+        return -1;
+    }
+
     // Connectivity statistics object removed due to crashes
 
-    // Note: Access control object removed to keep OBJ_COUNT at 6
+    // Note: Access control object removed to keep OBJ_COUNT at 8
     /*
     int instId = 0;
     objArray[7] = acc_ctrl_create_object();
@@ -1360,9 +1309,6 @@ int main(int argc, char *argv[]) {
             } else {
                 tv.tv_sec = reboot_time - tv_sec;
             }
-        } else if (batterylevelchanging) {
-            update_battery_level(lwm2mH);
-            tv.tv_sec = 5;
         } else {
             tv.tv_sec = 60;
         }
@@ -1424,10 +1370,9 @@ int main(int argc, char *argv[]) {
         
         // Start SignalK WebSocket client when LwM2M registration is complete
         if (signalk_enabled && !signalk_started && lwm2mH->state == STATE_READY) {
-            fprintf(stdout, "[SIGNALK] LwM2M registration complete - starting SignalK WebSocket client: %s:%d\r\n", 
-                    signalk_server, signalk_port);
+            fprintf(stdout, "[SIGNALK] LwM2M registration complete - starting SignalK WebSocket client\r\n");
             
-            if (signalk_ws_start(signalk_server, signalk_port) != 0) {
+            if (signalk_ws_start(NULL, 0, settings_file) != 0) {
                 fprintf(stderr, "[SIGNALK] Warning: Failed to start SignalK WebSocket client (server may not be running)\r\n");
                 fprintf(stderr, "[SIGNALK] Continuing without SignalK integration...\r\n");
             } else {
@@ -1620,10 +1565,19 @@ int main(int argc, char *argv[]) {
         free_object_location(objArray[4]);
     }
     if (objArray[5]) {
-        free_test_object(objArray[5]);
+        free_object_conn_m(objArray[5]);
     }
     if (objArray[6]) {
-        free_object_conn_m(objArray[6]);
+        free_object_generic_sensor(objArray[6]);
+    }
+    if (objArray[7]) {
+        free_power_measurement_object(objArray[7]);
+    }
+    if (objArray[8]) {
+        free_energy_object(objArray[8]);
+    }
+    if (objArray[9]) {
+        free_actuation_object(objArray[9]);
     }
     // free_object_conn_s - removed with connectivity statistics object
 

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <pthread.h>
 
-#define MAX_BRIDGE_RESOURCES 32
+#define MAX_BRIDGE_RESOURCES 128
 
 static bridge_resource_t registry[MAX_BRIDGE_RESOURCES];
 static int registry_count = 0;
@@ -20,8 +20,16 @@ int bridge_register(uint16_t objId, uint16_t instId, uint16_t resId, const char 
     pthread_mutex_lock(&reg_mutex);
 
     if (registry_count >= MAX_BRIDGE_RESOURCES) {
+        printf("[Bridge] Warning: Registry full (%d/%d). Cannot register %s\n", 
+               registry_count, MAX_BRIDGE_RESOURCES, signalK_path);
         pthread_mutex_unlock(&reg_mutex);
         return -1;
+    }
+
+    // Warning when approaching limit
+    if (registry_count >= (MAX_BRIDGE_RESOURCES * 0.8)) {
+        printf("[Bridge] Warning: Registry nearly full (%d/%d). Consider increasing MAX_BRIDGE_RESOURCES\n", 
+               registry_count, MAX_BRIDGE_RESOURCES);
     }
 
     bridge_resource_t *res = &registry[registry_count++];
@@ -31,6 +39,9 @@ int bridge_register(uint16_t objId, uint16_t instId, uint16_t resId, const char 
     strncpy(res->signalK_path, signalK_path, sizeof(res->signalK_path) - 1);
     res->value[0] = '\0';
     res->observed = 0;
+
+    printf("[Bridge] Registered mapping %d: %s -> Object %d/%d/%d\n", 
+           registry_count, signalK_path, objId, instId, resId);
 
     pthread_mutex_unlock(&reg_mutex);
     return 0;

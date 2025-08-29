@@ -1,0 +1,112 @@
+{
+  "signalk": {
+    "host": "localhost",
+    "port": 3000,
+    "subscriptions": [
+      {
+        "_comment": "Core navigation data - available on most SignalK servers",
+        "path": "navigation.position.latitude",
+        "lwm2m_object": 6,
+        "lwm2m_instance": 0,
+        "lwm2m_resource": 0,
+        "period": 2000,
+        "minPeriod": 1000,
+        "maxAge": 10000
+      },
+      {
+        "path": "navigation.position.longitude",
+        "lwm2m_object": 6,
+        "lwm2m_instance": 0,
+        "lwm2m_resource": 1,
+        "period": 2000,
+        "minPeriod": 1000,
+        "maxAge": 10000
+      }
+    ],
+    "_optional_subscriptions": [
+      {
+        "_comment": "Electrical data - only enable if you have battery monitoring",
+        "path": "electrical.batteries.house.voltage",
+        "lwm2m_object": 3305,
+        "lwm2m_instance": 0,
+        "lwm2m_resource": 5700,
+        "period": 5000,
+        "minPeriod": 2000,
+        "maxAge": 30000
+      },
+      {
+        "path": "electrical.batteries.engine.voltage",
+        "lwm2m_object": 3305,
+        "lwm2m_instance": 1,
+        "lwm2m_resource": 5700,
+        "period": 5000,
+        "minPeriod": 2000,
+        "maxAge": 30000
+      },
+      {
+        "path": "electrical.batteries.house.current",
+        "lwm2m_object": 3305,
+        "lwm2m_instance": 2,
+        "lwm2m_resource": 5700,
+        "period": 5000,
+        "minPeriod": 2000,
+        "maxAge": 30000
+      },
+      {
+        "_comment": "Solar data - only enable if you have solar panel monitoring",
+        "path": "electrical.solar.power",
+        "lwm2m_object": 3305,
+        "lwm2m_instance": 10,
+        "lwm2m_resource": 5700,
+        "period": 10000,
+        "minPeriod": 5000,
+        "maxAge": 60000
+      },
+      {
+        "path": "electrical.solar.cumulativeEnergy",
+        "lwm2m_object": 3331,
+        "lwm2m_instance": 0,
+        "lwm2m_resource": 5805,
+        "period": 30000,
+        "minPeriod": 10000,
+        "maxAge": 300000
+      },
+      {
+        "_comment": "Load monitoring - only enable if you have individual circuit monitoring",
+        "path": "electrical.loads.house.power",
+        "lwm2m_object": 3331,
+        "lwm2m_instance": 2,
+        "lwm2m_resource": 5820,
+        "period": 10000,
+        "minPeriod": 5000,
+        "maxAge": 60000
+      },
+      {
+        "_comment": "Shore power - only enable if you have shore power monitoring",
+        "path": "electrical.shore.cumulativeEnergy",
+        "lwm2m_object": 3331,
+        "lwm2m_instance": 1,
+        "lwm2m_resource": 5805,
+        "period": 30000,
+        "minPeriod": 10000,
+        "maxAge": 300000
+      },
+      {
+        "_comment": "Engine charging - only enable if you have alternator monitoring",
+        "path": "electrical.engine.cumulativeEnergy",
+        "lwm2m_object": 3331,
+        "lwm2m_instance": 3,
+        "lwm2m_resource": 5805,
+        "period": 30000,
+        "minPeriod": 10000,
+        "maxAge": 300000
+      }
+    ]
+  },
+  "lwm2m": {
+    "serverHost": "leshan.eclipseprojects.io",
+    "serverPort": 5683,
+    "endpointName": "MarineIoT-001",
+    "lifetime": 300
+  }
+}

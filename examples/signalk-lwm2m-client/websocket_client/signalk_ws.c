@@ -7,11 +7,13 @@
 #include <unistd.h>
 
 #include "bridge_object.h"
+#include "signalk_subscriptions.h"
 
 static struct lws_context *context;
 static struct lws *wsi;
 static pthread_t ws_thread;
 static int running = 1;
+static int subscription_sent = 0;
 
 static int callback_signalk(struct lws *wsi,
                             enum lws_callback_reasons reason,
@@ -20,7 +22,34 @@ static int callback_signalk(struct lws *wsi,
     switch (reason)
     {
     case LWS_CALLBACK_CLIENT_ESTABLISHED:
-        printf("[SignalK] Connected to server\n");
+        printf("[SignalK] Connected to server with subscribe=none - sending selective subscription\n");
+        signalk_log_subscription_status();
+        subscription_sent = 0;
+        lws_callback_on_writable(wsi);
+        break;
+
+    case LWS_CALLBACK_CLIENT_WRITEABLE:
+        if (!subscription_sent) {
+            char* subscription_json = NULL;
+            if (signalk_create_subscription_message(&subscription_json)) {
+                size_t sub_len = strlen(subscription_json);
+                unsigned char buf[LWS_PRE + sub_len];
+                memcpy(&buf[LWS_PRE], subscription_json, sub_len);
+                
+                int n = lws_write(wsi, &buf[LWS_PRE], sub_len, LWS_WRITE_TEXT);
+                if (n < 0) {
+                    printf("[SignalK] Failed to send subscription\n");
+                    free(subscription_json);
+                    return -1;
+                }
+                printf("[SignalK] Selective subscription sent (%zu bytes)\n", sub_len);
+                subscription_sent = 1;
+                free(subscription_json);
+            } else {
+                printf("[SignalK] Failed to create subscription message\n");
+                return -1;
+            }
+        }
         break;
 
     case LWS_CALLBACK_CLIENT_RECEIVE:
@@ -28,11 +57,18 @@ static int callback_signalk(struct lws *wsi,
         char *msg = strndup((const char *)in, len);
         if (!msg) break;
 
+        // Check for subscription response first
+        if (signalk_process_subscription_response(msg)) {
+            free(msg);
+            break;
+        }
+
         cJSON *json = cJSON_Parse(msg);
         free(msg);
 
         if (json)
         {
+
             // Signal K "delta" message has an "updates" array
             cJSON *updates = cJSON_GetObjectItem(json, "updates");
             if (cJSON_IsArray(updates))
@@ -52,16 +88,50 @@ static int callback_signalk(struct lws *wsi,
                             {
                                 char valbuf[64];
 
-                                if (cJSON_IsNumber(value))
-                                    snprintf(valbuf, sizeof(valbuf), "%f", value->valuedouble);
+                                // Handle navigation.position as a complex object with latitude/longitude
+                                if (strcmp(path->valuestring, "navigation.position") == 0 && cJSON_IsObject(value))
+                                {
+                                    cJSON *latitude = cJSON_GetObjectItem(value, "latitude");
+                                    cJSON *longitude = cJSON_GetObjectItem(value, "longitude");
+                                    
+                                    if (cJSON_IsNumber(latitude))
+                                    {
+                                        snprintf(valbuf, sizeof(valbuf), "%.6f", latitude->valuedouble);
+                                        bridge_update("navigation.position.latitude", valbuf);
+                                        printf("[SignalK] navigation.position.latitude = %s\n", valbuf);
+                                    }
+                                    
+                                    if (cJSON_IsNumber(longitude))
+                                    {
+                                        snprintf(valbuf, sizeof(valbuf), "%.6f", longitude->valuedouble);
+                                        bridge_update("navigation.position.longitude", valbuf);
+                                        printf("[SignalK] navigation.position.longitude = %s\n", valbuf);
+                                    }
+                                }
+                                else if (cJSON_IsNumber(value))
+                                {
+                                    // High precision for position-related data, normal for others
+                                    if (strstr(path->valuestring, "position") || 
+                                        strstr(path->valuestring, "latitude") || 
+                                        strstr(path->valuestring, "longitude")) {
+                                        snprintf(valbuf, sizeof(valbuf), "%.6f", value->valuedouble);
+                                    } else {
+                                        snprintf(valbuf, sizeof(valbuf), "%.3f", value->valuedouble);
+                                    }
+                                    bridge_update(path->valuestring, valbuf);
+                                    printf("[SignalK] %s = %s\n", path->valuestring, valbuf);
+                                }
                                 else if (cJSON_IsString(value))
+                                {
                                     snprintf(valbuf, sizeof(valbuf), "%s", value->valuestring);
+                                    bridge_update(path->valuestring, valbuf);
+                                    printf("[SignalK] %s = %s\n", path->valuestring, valbuf);
+                                }
                                 else
-                                    snprintf(valbuf, sizeof(valbuf), "UNSUPPORTED");
-
-                                // Push into bridge
-                                bridge_update(path->valuestring, valbuf);
-                                printf("[SignalK] %s = %s\n", path->valuestring, valbuf);
+                                {
+                                    // Only log unsupported types for debugging if needed
+                                    printf("[SignalK] %s = UNSUPPORTED_TYPE\n", path->valuestring);
+                                }
                             }
                         }
                     }
@@ -111,10 +181,34 @@ static void *ws_loop(void *arg)
     return NULL;
 }
 
-int signalk_ws_start(const char *server, int port)
+int signalk_ws_start(const char *server, int port, const char *settings_file)
 {
     struct lws_context_creation_info info;
     struct lws_client_connect_info ccinfo;
+
+    // Use provided settings file path, or default to current directory
+    const char *config_file = settings_file ? settings_file : "settings.json";
+    
+    // Load configuration from specified settings file
+    if (!signalk_load_config_from_file(config_file)) {
+        printf("[SignalK] Error: Failed to load %s\n", config_file);
+        printf("[SignalK] SignalK WebSocket client requires a valid settings.json configuration file\n");
+        printf("[SignalK] Please ensure %s exists and contains valid JSON configuration\n", config_file);
+        return -1;
+    }
+
+    // Check if we have any subscriptions
+    if (signalk_subscription_count == 0) {
+        printf("[SignalK] Warning: No subscriptions configured, SignalK data will not be received\n");
+        printf("[SignalK] Please check settings.json for subscription configuration\n");
+    }
+    
+    if (signalk_subscription_count == 0) {
+        printf("[SignalK] Warning: No subscriptions configured, WebSocket connection will be receive-only\n");
+    }
+
+    // Reset subscription state
+    subscription_sent = 0;
 
     memset(&info, 0, sizeof(info));
     info.port = CONTEXT_PORT_NO_LISTEN;
@@ -126,11 +220,23 @@ int signalk_ws_start(const char *server, int port)
         return -1;
     }
 
+    // Use configuration from settings.json or fallback
+    const char* target_server = signalk_server_config ? signalk_server_config->host : (server ? server : "127.0.0.1");
+    int target_port = signalk_server_config ? signalk_server_config->port : (port > 0 ? port : 3000);
+    char connection_path[600];
+    
+    if (signalk_server_config) {
+        snprintf(connection_path, sizeof(connection_path), "%s?subscribe=%s", 
+                signalk_server_config->path, signalk_server_config->subscribe_mode);
+    } else {
+        strcpy(connection_path, "/signalk/v1/stream?subscribe=none");
+    }
+
     memset(&ccinfo, 0, sizeof(ccinfo));
     ccinfo.context = context;
-    ccinfo.address = server;
-    ccinfo.port = port;
-    ccinfo.path = "/signalk/v1/stream";
+    ccinfo.address = target_server;
+    ccinfo.port = target_port;
+    ccinfo.path = connection_path;
     ccinfo.host = lws_canonical_hostname(context);
     ccinfo.origin = "origin";
     ccinfo.protocol = protocols[0].name;
@@ -177,5 +283,9 @@ void signalk_ws_stop(void)
         context = NULL;
     }
     wsi = NULL;
+    
+    // Clean up configuration
+    signalk_free_config();
+    
     printf("[SignalK] WebSocket client stopped\n");
 }

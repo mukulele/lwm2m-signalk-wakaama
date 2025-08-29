@@ -109,16 +109,7 @@ void display_security_object(lwm2m_object_t *objectP);
 void copy_security_object(lwm2m_object_t *objectDest, lwm2m_object_t *objectSrc);
 
 /*
- * object_generic.c wakatiwai
- */
-lwm2m_object_t * get_object(uint16_t objectId);
-void free_object(lwm2m_object_t * objectP);
-uint8_t handle_observe_response(lwm2m_context_t * lwm2mContext);
-uint8_t backup_object(lwm2m_object_t * objectP);
-uint8_t restore_object(lwm2m_object_t * objectP);
-
-/*
- * object_3300.c - Generic Sensor Object
+ * object_generic_sensor.c - Generic Sensor Object
  */
 lwm2m_object_t *get_object_generic_sensor(const char *path, const char *units);
 void free_object_generic_sensor(lwm2m_object_t *objectP);
