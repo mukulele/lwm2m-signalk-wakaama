@@ -64,6 +64,7 @@
 #include "object_energy.h"
 #include "object_actuation.h"
 #include "../websocket_client/signalk_ws.h"
+#include "../websocket_client/signalk_reconnect.h"
 #ifdef WITH_TINYDTLS
 #include "tinydtls/connection.h"
 #else
@@ -1369,6 +1370,11 @@ int main(int argc, char *argv[]) {
         if (signalk_enabled && !signalk_started && lwm2mH->state == STATE_READY) {
             fprintf(stdout, "[SIGNALK] LwM2M registration complete - starting SignalK WebSocket client\r\n");
             
+            // Initialize reconnection system with settings from file
+            if (!signalk_reconnect_load_config(settings_file)) {
+                fprintf(stdout, "[SIGNALK] Warning: Failed to load reconnection config, using defaults\r\n");
+            }
+            
             if (signalk_ws_start(NULL, 0, settings_file) != 0) {
                 fprintf(stderr, "[SIGNALK] Warning: Failed to start SignalK WebSocket client (server may not be running)\r\n");
                 fprintf(stderr, "[SIGNALK] Continuing without SignalK integration...\r\n");
@@ -1376,6 +1382,39 @@ int main(int argc, char *argv[]) {
                 fprintf(stdout, "[SIGNALK] WebSocket client started successfully\r\n");
                 fprintf(stdout, "[SIGNALK] Bridge system ready - marine data will be bridged to LwM2M objects\r\n");
                 signalk_started = true;
+                signalk_reconnect_on_connect(); // Reset reconnection state on successful start
+            }
+        }
+        
+        // Check SignalK WebSocket health and attempt reconnection if needed (marine-optimized)
+        if (signalk_enabled && signalk_started && lwm2mH->state == STATE_READY) {
+            static time_t last_ws_check = 0;
+            time_t now = lwm2m_gettime();
+            
+            // Check WebSocket health every 5 seconds (don't interfere with LwM2M cellular timing)
+            if (now - last_ws_check >= 5) {
+                if (!signalk_ws_is_connected()) {
+                    fprintf(stdout, "[SIGNALK] WebSocket disconnected - checking reconnection\r\n");
+                    signalk_reconnect_on_disconnect();
+                    
+                    if (signalk_reconnect_should_retry()) {
+                        fprintf(stdout, "[SIGNALK] Attempting WebSocket reconnection...\r\n");
+                        
+                        // Stop the old connection
+                        signalk_ws_stop();
+                        signalk_started = false;
+                        
+                        // Try to restart (will trigger on next loop if successful)
+                        // This allows the reconnection backoff timing to work properly
+                    } else {
+                        const signalk_connection_state_t *conn_state = signalk_reconnect_get_state();
+                        if (conn_state) {
+                            fprintf(stdout, "[SIGNALK] Waiting %d ms before next retry attempt\r\n", 
+                                   conn_state->next_delay_ms);
+                        }
+                    }
+                }
+                last_ws_check = now;
             }
         }
         

@@ -335,3 +335,7 @@ void signalk_ws_stop(void)
     
     printf("[SignalK] WebSocket client stopped\n");
 }
+
+bool signalk_ws_is_connected(void) {
+    return (running && context && wsi);
+}
