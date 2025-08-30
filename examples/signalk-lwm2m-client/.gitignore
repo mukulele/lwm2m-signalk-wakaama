@@ -12,3 +12,6 @@ build/
 *.backup
 *.bak
 *~
+signalk-lwm2m-client
+build_logs/
+udp/build/
