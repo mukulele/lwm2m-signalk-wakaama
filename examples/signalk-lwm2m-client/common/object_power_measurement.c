@@ -18,17 +18,18 @@
  * Measurement|      |           |     | electrical systems            |
  *
  * Resources:
- * Name               | ID | Oper.| Instances | Mand. |  Type   | Range | Units | Description |
- * -------------------+----+------+-----------+-------+---------+-------+-------+-------------|
- * Sensor Value       |5700|  R   |  Single   |  Yes  | Float   |       |   *   | Last measured value |
- * Sensor Units       |5701|  R   |  Single   |  No   | String  |       |       | Measurement units |
- * Min Measured Value |5602|  R   |  Single   |  No   | Float   |       |   *   | Minimum measured value |
- * Max Measured Value |5603|  R   |  Single   |  No   | Float   |       |   *   | Maximum measured value |
- * Min Range Value    |5604|  R   |  Single   |  No   | Float   |       |   *   | Minimum safe range |
- * Max Range Value    |5605|  R   |  Single   |  No   | Float   |       |   *   | Maximum safe range |
- * Reset Min/Max      |5605|  E   |  Single   |  No   | Opaque  |       |       | Reset min/max values |
- * Application Type   |5750|  R   |  Single   |  No   | String  |       |       | Application description |
- * Timestamp          |5518|  R   |  Single   |  No   | Time    |       |   s   | Measurement timestamp |
+ * Name                       | ID | Oper.| Instances | Mand. |  Type   | Range | Units | Description |
+ * ---------------------------+----+------+-----------+-------+---------+-------+-------+-------------|
+ * Instantaneous Active Power|5800|  R   |  Single   |  Yes  | Float   |       |   W   | Current active power |
+ * Min Measured Active Power |5801|  R   |  Single   |  No   | Float   |       |   W   | Min active power |
+ * Max Measured Active Power |5802|  R   |  Single   |  No   | Float   |       |   W   | Max active power |
+ * Cumulative Active Power   |5805|  R   |  Single   |  No   | Float   |       |  Wh   | Total energy consumed |
+ * Instantaneous Reactive Pwr|5810|  R   |  Single   |  No   | Float   |       |  var  | Current reactive power |
+ * Power Factor              |5820|  R   |  Single   |  No   | Float   |       |       | Power factor |
+ * Reset Min/Max Values      |5605|  E   |  Single   |  No   | Opaque  |       |       | Reset min/max |
+ * Reset Cumulative Energy   |5822|  E   |  Single   |  No   | Opaque  |       |       | Reset cumulative |
+ * Application Type          |5750|  RW  |  Single   |  No   | String  |       |       | Description |
+ * Timestamp                 |5518|  R   |  Single   |  No   | Time    |       |   s   | Measurement time |
  */
 
 #include "liblwm2m.h"

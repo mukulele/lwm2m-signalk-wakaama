@@ -1,3 +1,29 @@
+/*******************************************************************************
+ *
+ * Copyright (c) 2025 Marine IoT Systems
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v2.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * Contributors:
+ *    Marine IoT Systems - SignalK LwM2M Generic Sensor implementation
+ *
+ *******************************************************************************/
+
+/*
+ * Object     |      | Multiple  |     | Description                   |
+ * Name       |  ID  | Instances |Mand.|                               |
+ *------------+------+-----------+-----+-------------------------------+
+ * Generic    | 3300 |    Yes    |  No | Generic sensor for marine     |
+ * Sensor     |      |           |     | environmental monitoring      |
+ *
+ * Resources:
+ * Name               | ID | Oper.| Instances | Mand. |  Type   | Range | Units | Description |
+ *--------------------+----+------+-----------+-------+---------+-------+-------+-------------|
+ * Sensor Value       |5700|  R   |  Single   |  Yes  | String  |       |       | Sensor data |
+ * Sensor Units       |5701|  R   |  Single   |  No   | String  |       |       | Units       |
+ */
+
 #include "liblwm2m.h"
 #include "bridge_object.h"
 #include <stdlib.h>
