@@ -25,9 +25,9 @@ enable_testing()
 
 # Bridge Object CUnit Tests
 add_executable(test-bridge-object-cunit
-    test_bridge_object_runner.c
-    test_bridge_object_cunit.c
-    bridge_object_mock.c
+    tests/test_bridge_object_runner.c
+    tests/test_bridge_object_cunit.c
+    tests/bridge_object_mock.c
 )
 
 target_link_libraries(test-bridge-object-cunit 
@@ -40,9 +40,9 @@ target_compile_definitions(test-bridge-object-cunit PRIVATE _POSIX_C_SOURCE=2008
 
 # WebSocket CUnit Tests  
 add_executable(test-websocket-cunit
-    test_websocket_runner.c
-    test_websocket_cunit.c
-    websocket_mock.c
+    tests/test_websocket_runner.c
+    tests/test_websocket_cunit.c
+    tests/websocket_mock.c
 )
 
 target_link_libraries(test-websocket-cunit 
