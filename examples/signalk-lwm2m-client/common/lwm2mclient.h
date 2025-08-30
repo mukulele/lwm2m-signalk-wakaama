@@ -40,6 +40,7 @@ uint8_t device_change(lwm2m_data_t *dataArray, lwm2m_object_t *objectP);
 void display_device_object(lwm2m_object_t *objectP);
 void device_update_battery_level(lwm2m_object_t *objectP, float battery_percentage);
 void device_update_firmware_version(lwm2m_object_t *objectP);
+void device_update_hardware_info(lwm2m_object_t *objectP);
 /*
  * object_firmware.c
  */

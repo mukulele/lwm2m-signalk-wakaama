@@ -64,6 +64,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+#include <sys/utsname.h>
+#include <sys/statvfs.h>
+#include <sys/sysinfo.h>
+#include <errno.h>
 
 #define PRV_MANUFACTURER "Open Mobile Alliance"
 #define PRV_MODEL_NUMBER "Lightweight M2M Client"
@@ -116,6 +121,208 @@ typedef struct {
     uint8_t battery_level;
     char time_offset[PRV_OFFSET_MAXLEN];
 } device_data_t;
+
+// Hardware detection globals
+static char g_manufacturer[64] = {0};
+static char g_model[64] = {0};
+static char g_serial[32] = {0};
+static char g_os_version[128] = {0};
+static char g_kernel_version[64] = {0};
+static bool g_hardware_detected = false;
+
+/**
+ * Read a single line from a file
+ */
+static bool prv_read_file_line(const char *filename, char *buffer, size_t buffer_size) {
+    FILE *file = fopen(filename, "r");
+    if (!file) return false;
+    
+    bool success = (fgets(buffer, buffer_size, file) != NULL);
+    fclose(file);
+    
+    if (success) {
+        // Remove trailing newline
+        size_t len = strlen(buffer);
+        if (len > 0 && buffer[len-1] == '\n') {
+            buffer[len-1] = '\0';
+        }
+    }
+    
+    return success;
+}
+
+/**
+ * Extract field value from /proc/cpuinfo
+ */
+static bool prv_get_cpuinfo_field(const char *field_name, char *buffer, size_t buffer_size) {
+    FILE *file = fopen("/proc/cpuinfo", "r");
+    if (!file) return false;
+    
+    char line[256];
+    size_t field_len = strlen(field_name);
+    bool found = false;
+    
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, field_name, field_len) == 0) {
+            char *colon = strchr(line, ':');
+            if (colon) {
+                colon++; // Skip colon
+                while (*colon == ' ' || *colon == '\t') colon++; // Skip whitespace
+                
+                strncpy(buffer, colon, buffer_size - 1);
+                buffer[buffer_size - 1] = '\0';
+                
+                // Remove trailing newline
+                size_t len = strlen(buffer);
+                if (len > 0 && buffer[len-1] == '\n') {
+                    buffer[len-1] = '\0';
+                }
+                
+                found = true;
+                break;
+            }
+        }
+    }
+    
+    fclose(file);
+    return found;
+}
+
+/**
+ * Detect operating system information
+ */
+static bool prv_detect_os_info(void) {
+    struct utsname uts;
+    if (uname(&uts) == 0) {
+        // Get kernel version
+        strncpy(g_kernel_version, uts.release, sizeof(g_kernel_version) - 1);
+        
+        // Try to get OS version from /etc/os-release
+        FILE *os_file = fopen("/etc/os-release", "r");
+        if (os_file) {
+            char line[256];
+            while (fgets(line, sizeof(line), os_file)) {
+                if (strncmp(line, "PRETTY_NAME=", 12) == 0) {
+                    char *start = strchr(line, '"');
+                    if (start) {
+                        start++;
+                        char *end = strchr(start, '"');
+                        if (end) {
+                            *end = '\0';
+                            strncpy(g_os_version, start, sizeof(g_os_version) - 1);
+                        }
+                    }
+                    break;
+                }
+            }
+            fclose(os_file);
+        }
+        
+        // Fallback if no PRETTY_NAME found
+        if (strlen(g_os_version) == 0) {
+            snprintf(g_os_version, sizeof(g_os_version), "%s %s", uts.sysname, uts.release);
+        }
+        
+        return true;
+    }
+    
+    // Fallback
+    strncpy(g_os_version, "Linux (Unknown)", sizeof(g_os_version) - 1);
+    strncpy(g_kernel_version, "Unknown", sizeof(g_kernel_version) - 1);
+    return false;
+}
+
+/**
+ * Detect Raspberry Pi model from device tree
+ */
+static bool prv_detect_hardware(void) {
+    if (g_hardware_detected) {
+        return true;
+    }
+
+    // Detect OS information first
+    prv_detect_os_info();
+
+    // Set manufacturer (always Raspberry Pi Foundation for Pi devices)
+    strncpy(g_manufacturer, "Raspberry Pi Foundation", sizeof(g_manufacturer) - 1);
+    
+    // Try device tree model first
+    if (!prv_read_file_line("/proc/device-tree/model", g_model, sizeof(g_model))) {
+        // Fallback to cpuinfo Hardware field
+        if (!prv_get_cpuinfo_field("Hardware", g_model, sizeof(g_model))) {
+            // Last resort - try to detect from revision
+            char revision[32];
+            if (prv_get_cpuinfo_field("Revision", revision, sizeof(revision))) {
+                // Basic Pi model detection from revision codes
+                if (strstr(revision, "a02082") || strstr(revision, "a22082")) {
+                    strncpy(g_model, "Raspberry Pi 3 Model B", sizeof(g_model) - 1);
+                } else if (strstr(revision, "a020d3")) {
+                    strncpy(g_model, "Raspberry Pi 3 Model B+", sizeof(g_model) - 1);
+                } else if (strstr(revision, "a03111") || strstr(revision, "b03111") || strstr(revision, "c03111")) {
+                    strncpy(g_model, "Raspberry Pi 4 Model B", sizeof(g_model) - 1);
+                } else {
+                    snprintf(g_model, sizeof(g_model), "Raspberry Pi (Rev: %s)", revision);
+                }
+            } else {
+                strncpy(g_model, "SignalK-LwM2M Marine Gateway", sizeof(g_model) - 1);
+            }
+        }
+    }
+    
+    // Get serial number
+    if (!prv_get_cpuinfo_field("Serial", g_serial, sizeof(g_serial))) {
+        strncpy(g_serial, "SIGNALK-MARINE-001", sizeof(g_serial) - 1);
+    }
+    
+    g_hardware_detected = true;
+    printf("[Device] Hardware detected: %s %s (Serial: %s)\n", g_manufacturer, g_model, g_serial);
+    printf("[Device] OS: %s (Kernel: %s)\n", g_os_version, g_kernel_version);
+    
+    return true;
+}
+
+/**
+ * Get current free memory in MB
+ */
+static uint32_t prv_get_free_memory_mb(void) {
+    struct sysinfo si;
+    if (sysinfo(&si) == 0) {
+        uint64_t free_kb = (uint64_t)(si.freeram * si.mem_unit) / 1024;
+        return (uint32_t)(free_kb / 1024);
+    }
+    return PRV_MEMORY_FREE; // Fallback to default
+}
+
+/**
+ * Get disk usage information
+ */
+static bool prv_get_disk_usage(uint64_t *used_mb, uint64_t *total_mb, float *usage_percent) {
+    struct statvfs vfs;
+    if (statvfs("/", &vfs) == 0) {
+        uint64_t total_kb = (uint64_t)(vfs.f_blocks * vfs.f_frsize) / 1024;
+        uint64_t free_kb = (uint64_t)(vfs.f_bavail * vfs.f_frsize) / 1024;
+        uint64_t used_kb = total_kb - free_kb;
+        
+        *total_mb = total_kb / 1024;
+        *used_mb = used_kb / 1024;
+        *usage_percent = total_kb > 0 ? (used_kb * 100.0f) / total_kb : 0.0f;
+        
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Get CPU temperature from thermal zone
+ */
+static float prv_get_cpu_temperature(void) {
+    char temp_str[16];
+    if (prv_read_file_line("/sys/class/thermal/thermal_zone0/temp", temp_str, sizeof(temp_str))) {
+        int temp_millicelsius = atoi(temp_str);
+        return temp_millicelsius / 1000.0f;
+    }
+    return -1.0f;
+}
 
 // basic check that the time offset value is at ISO 8601 format
 // bug: +12:30 is considered a valid value by this function
@@ -170,25 +377,33 @@ static uint8_t prv_set_value(lwm2m_data_t *dataP, device_data_t *devDataP) {
     case RES_O_MANUFACTURER:
         if (dataP->type == LWM2M_TYPE_MULTIPLE_RESOURCE)
             return COAP_404_NOT_FOUND;
-        lwm2m_data_encode_string(PRV_MANUFACTURER, dataP);
+        prv_detect_hardware();
+        lwm2m_data_encode_string(g_manufacturer, dataP);
         return COAP_205_CONTENT;
 
     case RES_O_MODEL_NUMBER:
         if (dataP->type == LWM2M_TYPE_MULTIPLE_RESOURCE)
             return COAP_404_NOT_FOUND;
-        lwm2m_data_encode_string(PRV_MODEL_NUMBER, dataP);
+        prv_detect_hardware();
+        lwm2m_data_encode_string(g_model, dataP);
         return COAP_205_CONTENT;
 
     case RES_O_SERIAL_NUMBER:
         if (dataP->type == LWM2M_TYPE_MULTIPLE_RESOURCE)
             return COAP_404_NOT_FOUND;
-        lwm2m_data_encode_string(PRV_SERIAL_NUMBER, dataP);
+        prv_detect_hardware();
+        lwm2m_data_encode_string(g_serial, dataP);
         return COAP_205_CONTENT;
 
     case RES_O_FIRMWARE_VERSION:
         if (dataP->type == LWM2M_TYPE_MULTIPLE_RESOURCE)
             return COAP_404_NOT_FOUND;
-        lwm2m_data_encode_string(PRV_FIRMWARE_VERSION, dataP);
+        prv_detect_hardware();
+        if (strlen(g_os_version) > 0) {
+            lwm2m_data_encode_string(g_os_version, dataP);
+        } else {
+            lwm2m_data_encode_string(PRV_FIRMWARE_VERSION, dataP);
+        }
         return COAP_205_CONTENT;
 
     case RES_M_REBOOT:
@@ -608,11 +823,29 @@ lwm2m_object_t *get_object_device(void) {
          * Also some user data can be stored in the object with a private structure containing the needed variables
          */
         if (NULL != deviceObj->userData) {
+            // Initialize hardware detection
+            prv_detect_hardware();
+            
             ((device_data_t *)deviceObj->userData)->battery_level = PRV_BATTERY_LEVEL;
-            ((device_data_t *)deviceObj->userData)->free_memory = PRV_MEMORY_FREE;
+            
+            // Use real hardware memory info
+            uint32_t free_memory_mb = prv_get_free_memory_mb();
+            ((device_data_t *)deviceObj->userData)->free_memory = free_memory_mb;
+                
             ((device_data_t *)deviceObj->userData)->error = PRV_ERROR_CODE;
             ((device_data_t *)deviceObj->userData)->time = 1367491215;
             strcpy(((device_data_t *)deviceObj->userData)->time_offset, "+01:00"); // NOSONAR
+            
+            // Show initial system status
+            uint64_t disk_used_mb, disk_total_mb;
+            float disk_usage_percent;
+            if (prv_get_disk_usage(&disk_used_mb, &disk_total_mb, &disk_usage_percent)) {
+                printf("[Device] System status - Memory: %d MB free, Disk: %.1f%% used, Temp: %.1f°C\n",
+                       (int)free_memory_mb, disk_usage_percent, prv_get_cpu_temperature());
+            } else {
+                printf("[Device] Initialized with hardware info - Free memory: %d MB\n",
+                       (int)free_memory_mb);
+            }
         } else {
             lwm2m_free(deviceObj->instanceList);
             lwm2m_free(deviceObj);
@@ -673,4 +906,46 @@ uint8_t device_change(lwm2m_data_t *dataArray, lwm2m_object_t *objectP) {
     }
 
     return result;
+}
+
+/**
+ * Update device object with real hardware information
+ */
+void device_update_hardware_info(lwm2m_object_t *objectP) {
+    if (!objectP || !objectP->userData) {
+        return;
+    }
+    
+    device_data_t *deviceData = (device_data_t *)objectP->userData;
+    
+    // Update free memory with real value
+    uint32_t free_memory_mb = prv_get_free_memory_mb();
+    deviceData->free_memory = free_memory_mb;
+    
+    // Get disk usage information
+    uint64_t disk_used_mb, disk_total_mb;
+    float disk_usage_percent;
+    if (prv_get_disk_usage(&disk_used_mb, &disk_total_mb, &disk_usage_percent)) {
+        printf("[Device] System health - Memory: %d MB free, Disk: %.1f%% used (%llu/%llu MB)\n", 
+               (int)deviceData->free_memory, disk_usage_percent, 
+               (unsigned long long)disk_used_mb, (unsigned long long)disk_total_mb);
+        
+        // Log warning if disk usage is high (>80% for marine deployments)
+        if (disk_usage_percent > 80.0f) {
+            printf("[Device] WARNING: Disk usage high (%.1f%%) - consider maintenance\n", disk_usage_percent);
+        }
+    } else {
+        printf("[Device] Updated hardware info - Free memory: %d MB\n", 
+               (int)deviceData->free_memory);
+    }
+    
+    // Get CPU temperature for marine environment monitoring
+    float cpu_temp = prv_get_cpu_temperature();
+    if (cpu_temp > 0) {
+        printf("[Device] CPU temperature: %.1f°C", cpu_temp);
+        if (cpu_temp > 70.0f) {
+            printf(" (HIGH - check cooling!)");
+        }
+        printf("\n");
+    }
 }
