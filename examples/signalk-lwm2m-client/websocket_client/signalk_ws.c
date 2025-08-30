@@ -5,10 +5,24 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "bridge_object.h"
 #include "signalk_subscriptions.h"
-#include "signalk_auth.h"
+
+// Authentication state management (consolidated from signalk_auth)
+typedef struct {
+    bool enabled;
+    char username[64];
+    char password[64];
+    char token[512];
+    time_t token_expires;
+    bool authenticated;
+    char request_id[32];
+    uint32_t request_counter;
+} auth_context_t;
+
+static auth_context_t g_auth = {0};
 
 static struct lws_context *context;
 static struct lws *wsi;
@@ -16,6 +30,127 @@ static pthread_t ws_thread;
 static int running = 1;
 static int subscription_sent = 0;
 static int auth_flow_started = 0;
+
+// ============================================================================
+// Consolidated Authentication Functions
+// ============================================================================
+
+static void generate_request_id(char *request_id, size_t max_len) {
+    g_auth.request_counter++;
+    snprintf(request_id, max_len, "lwm2m-auth-%u-%lu", 
+             g_auth.request_counter, (unsigned long)time(NULL));
+}
+
+static bool signalk_auth_is_enabled(void) {
+    return g_auth.enabled;
+}
+
+static bool signalk_auth_is_authenticated(void) {
+    if (!g_auth.enabled) return true; // No auth required
+    return g_auth.authenticated && (g_auth.token[0] != '\0') && (time(NULL) < g_auth.token_expires);
+}
+
+static size_t signalk_auth_generate_login_message(char *buffer, size_t buffer_size) {
+    if (!buffer || !g_auth.enabled) return 0;
+    
+    generate_request_id(g_auth.request_id, sizeof(g_auth.request_id));
+    
+    int result = snprintf(buffer, buffer_size,
+        "{"
+        "\"requestId\":\"%s\","
+        "\"login\":{"
+        "\"username\":\"%s\","
+        "\"password\":\"%s\""
+        "}"
+        "}",
+        g_auth.request_id, g_auth.username, g_auth.password
+    );
+    
+    if (result > 0 && (size_t)result < buffer_size) {
+        printf("[SignalK Auth] Generated login message for user: %s\n", g_auth.username);
+        return (size_t)result;
+    }
+    return 0;
+}
+
+static bool signalk_auth_process_response(const char *json_response) {
+    if (!json_response || !g_auth.enabled) return false;
+    
+    cJSON *root = cJSON_Parse(json_response);
+    if (!root) return false;
+    
+    // Check if this is our auth response
+    cJSON *request_id_obj = cJSON_GetObjectItem(root, "requestId");
+    if (!request_id_obj || strcmp(cJSON_GetStringValue(request_id_obj), g_auth.request_id) != 0) {
+        cJSON_Delete(root);
+        return false;
+    }
+    
+    // Check result code
+    cJSON *result_obj = cJSON_GetObjectItem(root, "result");
+    if (!result_obj || cJSON_GetNumberValue(result_obj) != 200) {
+        printf("[SignalK Auth] Authentication failed\n");
+        g_auth.authenticated = false;
+        cJSON_Delete(root);
+        return false;
+    }
+    
+    // Extract token
+    cJSON *login_obj = cJSON_GetObjectItem(root, "login");
+    cJSON *token_obj = cJSON_GetObjectItem(login_obj, "token");
+    if (!token_obj) {
+        cJSON_Delete(root);
+        return false;
+    }
+    
+    const char *token = cJSON_GetStringValue(token_obj);
+    if (!token || strlen(token) >= sizeof(g_auth.token)) {
+        cJSON_Delete(root);
+        return false;
+    }
+    
+    // Get TTL
+    cJSON *ttl_obj = cJSON_GetObjectItem(login_obj, "timeToLive");
+    int ttl = ttl_obj ? cJSON_GetNumberValue(ttl_obj) : 3600;
+    
+    // Store authentication data
+    strncpy(g_auth.token, token, sizeof(g_auth.token) - 1);
+    g_auth.token[sizeof(g_auth.token) - 1] = '\0';
+    g_auth.token_expires = time(NULL) + ttl;
+    g_auth.authenticated = true;
+    
+    printf("[SignalK Auth] Successfully authenticated! Token expires in %d seconds\n", ttl);
+    
+    cJSON_Delete(root);
+    return true;
+}
+
+static bool signalk_auth_init(const char *username, const char *password) {
+    if (!username || !password) {
+        g_auth.enabled = false;
+        return true;
+    }
+    
+    g_auth.enabled = true;
+    strncpy(g_auth.username, username, sizeof(g_auth.username) - 1);
+    strncpy(g_auth.password, password, sizeof(g_auth.password) - 1);
+    g_auth.authenticated = false;
+    g_auth.token[0] = '\0';
+    g_auth.token_expires = 0;
+    g_auth.request_counter = 0;
+    
+    printf("[SignalK Auth] Initialized - Authentication ENABLED for user: %s\n", username);
+    return true;
+}
+
+static void signalk_auth_cleanup(void) {
+    memset(&g_auth, 0, sizeof(g_auth));
+    printf("[SignalK Auth] Cleanup completed\n");
+}
+
+// ============================================================================
+// WebSocket Callback Function
+// ============================================================================
 
 static int callback_signalk(struct lws *wsi,
                             enum lws_callback_reasons reason,
@@ -230,33 +365,22 @@ int signalk_ws_start(const char *server, int port, const char *settings_file)
                 if (token_json) {
                     cJSON *auth_obj = cJSON_GetObjectItem(token_json, "authentication");
                     if (auth_obj) {
-                        signalk_auth_config_t auth_config = {0};
-                        
                         cJSON *enabled = cJSON_GetObjectItem(auth_obj, "enabled");
-                        if (enabled && cJSON_IsBool(enabled)) {
-                            auth_config.enabled = cJSON_IsTrue(enabled);
-                        }
-                        
                         cJSON *username = cJSON_GetObjectItem(auth_obj, "username");
-                        if (username && cJSON_IsString(username)) {
-                            strncpy(auth_config.username, cJSON_GetStringValue(username), 
-                                   sizeof(auth_config.username) - 1);
-                        }
-                        
                         cJSON *password = cJSON_GetObjectItem(auth_obj, "password");
-                        if (password && cJSON_IsString(password)) {
-                            strncpy(auth_config.password, cJSON_GetStringValue(password), 
-                                   sizeof(auth_config.password) - 1);
-                        }
                         
-                        cJSON *renewal_time = cJSON_GetObjectItem(auth_obj, "token_renewal_time");
-                        if (renewal_time && cJSON_IsNumber(renewal_time)) {
-                            auth_config.token_renewal_time = (uint32_t)cJSON_GetNumberValue(renewal_time);
-                        }
-                        
-                        // Initialize authentication module
-                        if (!signalk_auth_init(&auth_config)) {
-                            printf("[SignalK Auth] Warning: Failed to initialize authentication\n");
+                        if (enabled && cJSON_IsTrue(enabled) && 
+                            username && cJSON_IsString(username) &&
+                            password && cJSON_IsString(password)) {
+                            
+                            // Initialize authentication with username/password
+                            if (!signalk_auth_init(cJSON_GetStringValue(username), 
+                                                 cJSON_GetStringValue(password))) {
+                                printf("[SignalK Auth] Warning: Failed to initialize authentication\n");
+                            }
+                        } else {
+                            // Authentication disabled or incomplete config
+                            signalk_auth_init(NULL, NULL);
                         }
                     }
                     cJSON_Delete(token_json);
@@ -267,6 +391,7 @@ int signalk_ws_start(const char *server, int port, const char *settings_file)
         }
     } else {
         printf("[SignalK Auth] No token.json found - authentication disabled\n");
+        signalk_auth_init(NULL, NULL);
     }
 
     subscription_sent = 0;

@@ -47,8 +47,6 @@ target_sources(
             ../websocket_client/signalk_control.h
             ../websocket_client/signalk_reconnect.c
             ../websocket_client/signalk_reconnect.h
-            ../websocket_client/signalk_auth.c
-            ../websocket_client/signalk_auth.h
 )
 
 target_include_directories(signalk-lwm2m-client PRIVATE ../common ../websocket_client)
