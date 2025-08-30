@@ -128,7 +128,7 @@ Wakaama provides a simple CLI library. It can be enabled with:
   - Version control system: Git (and a GitHub account)
   - Git commit message linter: gitlint
   - Build system: ninja
-  - C code formatting: clang-format, version 18
+  - C code formatting: clang-format, version 18 (30.08.2025: change to version 19)
   - CMake list files formatting: cmake-format, version 0.6.13
   - Unit testing: CUnit
 
@@ -202,6 +202,12 @@ Options:
  * ``cmake -S examples/client/udp -B build-client-udp``
  * ``cmake --build build-client-udp``
  * ``./build-client-udp/lwm2mclient [Options]``
+
+### SignalK-LwM2M client example
+
+ * ``cmake -S examples/signalk-lwm2m-client/udp -B build-signalk-client``
+ * ``cmake --build build-signalk-client``
+ * ``./build-signalk-client/signalk-lwm2m-client [Options]``
 
 Next to lwm2mclient there are also examples with DTLS enabled and with raw block1 transfer enabled.
 

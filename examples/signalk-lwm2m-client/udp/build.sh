@@ -69,8 +69,8 @@ log_header() {
 
 # Print banner
 print_banner() {
-    echo -e "${CYAN}🌊 Marine IoT SignalK-LwM2M Client Builder${NC}"
-    echo -e "${CYAN}==========================================${NC}"
+    echo -e "${CYAN}🌊 SignalK-LwM2M Client Builder${NC}"
+    echo -e "${CYAN}================================${NC}"
     echo ""
     echo -e "${BLUE}Version:${NC} $VERSION"
     echo -e "${BLUE}Build Date:${NC} $BUILD_DATE"
@@ -83,7 +83,7 @@ print_banner() {
 # Show help
 show_help() {
     cat << EOF
-🌊 Marine IoT SignalK-LwM2M Client Builder
+🌊 SignalK-LwM2M Client Builder
 
 USAGE:
     ./build.sh [OPTIONS]
@@ -104,15 +104,6 @@ EXAMPLES:
     ./build.sh -d -t             # Debug build with tests
     ./build.sh --clean --coverage # Clean build with coverage
 
-FEATURES:
-    ✅ Professional wakaama-based LwM2M client
-    ✅ SignalK WebSocket integration with authentication
-    ✅ Marine IoT IPSO objects (sensors, actuators, power)
-    ✅ Bridge functionality for SignalK ↔ LwM2M data flow
-    ✅ Hot-reload configuration support
-    ✅ Automatic reconnection with exponential backoff
-    ✅ Professional error handling and logging
-
 DEPENDENCIES:
     - cmake (>= 3.21)
     - make
@@ -122,9 +113,9 @@ DEPENDENCIES:
     - libcurl4-openssl-dev
     - pkg-config
 
-MARINE DEPLOYMENT:
-    The built client supports real-time marine sensor data collection,
-    vessel system control, and integration with navigation systems.
+TESTING:
+    Marine IoT Tests:        cd ../websocket_client/tests && ./run_tests.sh
+    Wakaama Core Tests:      ./run_wakaama_tests.sh
 
 🚢 Ready for sea deployment!
 EOF

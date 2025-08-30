@@ -57,22 +57,16 @@ pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
 pkg_check_modules(CJSON REQUIRED libcjson)
 pkg_check_modules(CURL REQUIRED libcurl)
 
-target_link_libraries(signalk-lwm2m-client PRIVATE 
-    wakaama_static 
-    gps 
-    ${LIBWEBSOCKETS_LIBRARIES}
-    ${CJSON_LIBRARIES}
-    ${CURL_LIBRARIES}
-    pthread
+target_link_libraries(
+    signalk-lwm2m-client PRIVATE wakaama_static gps ${LIBWEBSOCKETS_LIBRARIES} ${CJSON_LIBRARIES} ${CURL_LIBRARIES}
+                                 pthread
 )
 
-target_include_directories(signalk-lwm2m-client PRIVATE 
-    ${LIBWEBSOCKETS_INCLUDE_DIRS}
-    ${CJSON_INCLUDE_DIRS}
-    ${CURL_INCLUDE_DIRS}
+target_include_directories(
+    signalk-lwm2m-client PRIVATE ${LIBWEBSOCKETS_INCLUDE_DIRS} ${CJSON_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS}
 )
 
 enable_testing()
 
-# Note: Comprehensive test suite is available in ../websocket_client/tests/
-# Run: ./websocket_client/tests/run_tests.sh for full test execution
+# Note: Comprehensive test suite is available in ../websocket_client/tests/ Run: ./websocket_client/tests/run_tests.sh
+# for full test execution
