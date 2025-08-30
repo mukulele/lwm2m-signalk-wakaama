@@ -42,6 +42,6 @@ tlvdecode
 
 # SonarQube default work directory
 .scannerwork
-# Test artifacts and logs
-examples/signalk-lwm2m-client/websocket_client/test_logs/
-examples/signalk-lwm2m-client/websocket_client/invalid_test.json
+
+# Test directories and artifacts
+examples/signalk-lwm2m-client/websocket_client/tests/

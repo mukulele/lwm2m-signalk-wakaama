@@ -77,19 +77,22 @@ End-to-end testing of the entire marine IoT system:
 
 ```bash
 # Run all tests
-./run_tests.sh
+./tests/run_tests.sh
 
 # Run only unit tests
-./run_tests.sh unit
+./tests/run_tests.sh unit
 
 # Run only integration tests  
-./run_tests.sh integration
+./tests/run_tests.sh integration
 
 # Run with coverage analysis
-./run_tests.sh coverage
+./tests/run_tests.sh coverage
 
 # Clean and rebuild
-./run_tests.sh clean
+```bash
+# Clean rebuild
+./tests/run_tests.sh clean
+```
 ```
 
 ### Individual Test Execution
@@ -216,8 +219,8 @@ sudo apt-get install libwebsockets-dev libcjson-dev cmake build-essential
 #### Test Failures
 ```bash
 # Check test logs
-ls test_logs/
-cat test_logs/test_run_YYYYMMDD_HHMMSS.log
+ls tests/test_logs/
+cat tests/test_logs/test_run_YYYYMMDD_HHMMSS.log
 
 # Run individual tests for debugging
 ./build/test-bridge-object
@@ -246,20 +249,20 @@ gdb ./test-integration
 
 All test runs generate detailed logs:
 
-- **Location**: `test_logs/`
+- **Location**: `tests/test_logs/`
 - **Format**: `test_run_YYYYMMDD_HHMMSS.log`
 - **Content**: Detailed execution, errors, performance metrics
 
 ### Log Analysis
 ```bash
 # View latest test run
-tail -f test_logs/test_run_*.log
+tail -f tests/test_logs/test_run_*.log
 
 # Search for failures
-grep -i "fail\|error" test_logs/*.log
+grep -i "fail\|error" tests/test_logs/*.log
 
 # Performance analysis
-grep -i "performance\|timing" test_logs/*.log
+grep -i "performance\|timing" tests/test_logs/*.log
 ```
 
 ## 🎯 Success Criteria
