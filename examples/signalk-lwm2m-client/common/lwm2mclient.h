@@ -117,4 +117,11 @@ void copy_security_object(lwm2m_object_t *objectDest, lwm2m_object_t *objectSrc)
 lwm2m_object_t *get_object_generic_sensor(const char *path, const char *units);
 void free_object_generic_sensor(lwm2m_object_t *objectP);
 
+/*
+ * Marine IoT Objects
+ */
+lwm2m_object_t *get_power_measurement_object(void);
+lwm2m_object_t *get_energy_object(void);
+lwm2m_object_t *get_actuation_object(void);
+
 #endif /* LWM2MCLIENT_H_ */
