@@ -1,0 +1,23 @@
+{
+    "files.exclude": {
+        "**/*.o": true,
+        "**/*.a": true,
+        "**/build": false,
+        "**/.git": true,
+        "**/CMakeFiles": true,
+        "**/CMakeCache.txt": true,
+        "**/cmake_install.cmake": true,
+        "**/Makefile": false
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.intelliSenseMode": "linux-gcc-arm",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+    "cmake.buildDirectory": "${workspaceFolder}/examples/signalk-lwm2m-client/udp/build",
+    "cmake.sourceDirectory": "${workspaceFolder}/examples/signalk-lwm2m-client/udp",
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
+}

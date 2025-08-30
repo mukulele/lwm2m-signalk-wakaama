@@ -1,0 +1,32 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/core",
+                "${workspaceFolder}/coap",
+                "${workspaceFolder}/data",
+                "${workspaceFolder}/examples/signalk-lwm2m-client/common",
+                "${workspaceFolder}/examples/signalk-lwm2m-client/websocket_client",
+                "/usr/include",
+                "/usr/local/include",
+                "/usr/include/json-c",
+                "/usr/include/libwebsockets"
+            ],
+            "defines": [
+                "LWM2M_CLIENT_MODE",
+                "LWM2M_BOOTSTRAP",
+                "LWM2M_LITTLE_ENDIAN",
+                "WITH_LOGS"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-arm",
+            "compileCommands": "${workspaceFolder}/examples/signalk-lwm2m-client/udp/build/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
