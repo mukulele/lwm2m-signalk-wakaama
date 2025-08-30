@@ -1,0 +1,58 @@
+-- The C compiler identification is GNU 12.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "1.8.1") 
+-- Checking for module 'libwebsockets'
+--   Found libwebsockets, version 4.1.6-
+-- Checking for module 'libcjson'
+--   Found libcjson, version 1.7.15
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Marine IoT Test Suite configured:
+--   - Bridge Object Tests: test-bridge-simple
+--   - WebSocket Tests: test-websocket-simple
+--   - Run all tests: make test-all
+--   - Run unit tests: make test-unit
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/build
+[  3%] Building C object CMakeFiles/test-bridge-simple.dir/test_bridge_simple.c.o
+[  7%] Building C object CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/examples/signalk-lwm2m-client/common/bridge_object.c.o
+[ 10%] Building C object CMakeFiles/test-websocket-simple.dir/test_websocket_simple.c.o
+[ 14%] Building C object CMakeFiles/test-websocket-simple.dir/signalk_ws.c.o
+[ 17%] Building C object CMakeFiles/test-websocket-simple.dir/home/pi/wakaama/core/liblwm2m.c.o
+[ 21%] Building C object CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/core/liblwm2m.c.o
+[ 25%] Building C object CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/core/uri.c.o
+[ 28%] Building C object CMakeFiles/test-websocket-simple.dir/home/pi/wakaama/core/uri.c.o
+[ 32%] Building C object CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/core/utils.c.o
+[ 35%] Building C object CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/core/objects.c.o
+[ 39%] Building C object CMakeFiles/test-websocket-simple.dir/home/pi/wakaama/core/utils.c.o
+[ 42%] Building C object CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/core/list.c.o
+[ 46%] Building C object CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/core/packet.c.o
+[ 50%] Building C object CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/data/data.c.o
+/home/pi/wakaama/core/packet.c:98:15: error: ‘LWM2M_COAP_DEFAULT_BLOCK_SIZE’ undeclared here (not in a function)
+   98 | static_assert(LWM2M_COAP_DEFAULT_BLOCK_SIZE == 16 || LWM2M_COAP_DEFAULT_BLOCK_SIZE == 32 ||
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/pi/wakaama/core/packet.c:98:15: error: expression in static assertion is not an integer
+make[2]: *** [CMakeFiles/test-bridge-simple.dir/build.make:174: CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/core/packet.c.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+[ 53%] Building C object CMakeFiles/test-bridge-simple.dir/home/pi/wakaama/data/tlv.c.o
+[ 57%] Building C object CMakeFiles/test-websocket-simple.dir/home/pi/wakaama/core/objects.c.o
+[ 60%] Building C object CMakeFiles/test-websocket-simple.dir/home/pi/wakaama/core/list.c.o
+[ 64%] Building C object CMakeFiles/test-websocket-simple.dir/home/pi/wakaama/core/packet.c.o
+make[1]: *** [CMakeFiles/Makefile2:88: CMakeFiles/test-bridge-simple.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 67%] Building C object CMakeFiles/test-websocket-simple.dir/home/pi/wakaama/data/data.c.o
+[ 71%] Building C object CMakeFiles/test-websocket-simple.dir/home/pi/wakaama/data/tlv.c.o
+/home/pi/wakaama/core/packet.c:98:15: error: ‘LWM2M_COAP_DEFAULT_BLOCK_SIZE’ undeclared here (not in a function)
+   98 | static_assert(LWM2M_COAP_DEFAULT_BLOCK_SIZE == 16 || LWM2M_COAP_DEFAULT_BLOCK_SIZE == 32 ||
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/pi/wakaama/core/packet.c:98:15: error: expression in static assertion is not an integer
+make[2]: *** [CMakeFiles/test-websocket-simple.dir/build.make:174: CMakeFiles/test-websocket-simple.dir/home/pi/wakaama/core/packet.c.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [CMakeFiles/Makefile2:114: CMakeFiles/test-websocket-simple.dir/all] Error 2
+make: *** [Makefile:101: all] Error 2

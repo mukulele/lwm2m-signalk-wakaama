@@ -1,0 +1,343 @@
+-- The C compiler identification is GNU 12.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "1.8.1") 
+-- Checking for module 'libwebsockets'
+--   Found libwebsockets, version 4.1.6-
+-- Checking for module 'libcjson'
+--   Found libcjson, version 1.7.15
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Marine IoT Test Suite configured:
+--   - Bridge Object Tests: test-bridge-object
+--   - IPSO Objects Tests: test-ipso-objects
+--   - SignalK Auth Tests: test-signalk-auth
+--   - Integration Tests: test-integration
+--   - Run all tests: make test-all
+--   - Run unit tests: make test-unit
+--   - Run integration: make test-marine
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/build
+[  1%] Building C object CMakeFiles/test-bridge-object.dir/test_bridge_object.c.o
+[  3%] Building C object CMakeFiles/test-signalk-auth.dir/test_signalk_auth.c.o
+[  4%] Building C object CMakeFiles/test-ipso-objects.dir/test_ipso_objects.c.o
+[  6%] Building C object CMakeFiles/test-integration.dir/test_integration.c.o
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c: In function ‘test_jwt_token_validation’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:47:19: warning: implicit declaration of function ‘is_token_valid’ [-Wimplicit-function-declaration]
+   47 |     bool result = is_token_valid(valid_jwt);
+      |                   ^~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c: In function ‘test_path_translation’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:83:18: warning: implicit declaration of function ‘bridge_find_lwm2m_resource’ [-Wimplicit-function-declaration]
+   83 |     bool found = bridge_find_lwm2m_resource("electrical.switches.navigation.lights",
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c: In function ‘test_token_persistence’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:81:19: warning: implicit declaration of function ‘save_token’ [-Wimplicit-function-declaration]
+   81 |     bool result = save_token(test_token);
+      |                   ^~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:97:24: warning: implicit declaration of function ‘bridge_find_signalk_path’ [-Wimplicit-function-declaration]
+   97 |     const char* path = bridge_find_signalk_path(3306, 0, 5850);
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:97:24: warning: initialization of ‘const char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:101:10: warning: assignment to ‘const char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+  101 |     path = bridge_find_signalk_path(3300, 0, 5700);
+      |          ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:106:10: warning: assignment to ‘const char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+  106 |     path = bridge_find_signalk_path(9999, 0, 9999);
+      |          ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c: In function ‘test_value_updates’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:117:19: error: void value not ignored as it ought to be
+  117 |     bool result = bridge_update("electrical.switches.bilge.pump", "1");
+      |                   ^~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:121:12: error: void value not ignored as it ought to be
+  121 |     result = bridge_update("non.existent.path", "test_value");
+      |            ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:125:12: error: void value not ignored as it ought to be
+  125 |     result = bridge_update(NULL, "value");
+      |            ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:128:12: error: void value not ignored as it ought to be
+  128 |     result = bridge_update("electrical.switches.bilge.pump", NULL);
+      |            ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:85:27: warning: implicit declaration of function ‘load_token’ [-Wimplicit-function-declaration]
+   85 |     cJSON* loaded_token = load_token();
+      |                           ^~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:85:27: warning: initialization of ‘cJSON *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:105:28: warning: initialization of ‘cJSON *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+  105 |     cJSON* missing_token = load_token();
+      |                            ^~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c: In function ‘test_marine_scenarios’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:213:17: error: void value not ignored as it ought to be
+  213 |     TEST_ASSERT(bridge_update("electrical.switches.navigation.lights", "1"),
+      |                 ^~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:29:13: note: in definition of macro ‘TEST_ASSERT’
+   29 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:215:17: error: void value not ignored as it ought to be
+  215 |     TEST_ASSERT(bridge_update("electrical.switches.bilge.pump", "1"),
+      |                 ^~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:29:13: note: in definition of macro ‘TEST_ASSERT’
+   29 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c: In function ‘test_authentication_context’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:114:5: error: unknown type name ‘auth_context_t’
+  114 |     auth_context_t auth_ctx;
+      |     ^~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:217:17: error: void value not ignored as it ought to be
+  217 |     TEST_ASSERT(bridge_update("environment.water.temperature", "15.5"),
+      |                 ^~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:29:13: note: in definition of macro ‘TEST_ASSERT’
+   29 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:219:17: error: void value not ignored as it ought to be
+  219 |     TEST_ASSERT(bridge_update("electrical.batteries.house.voltage", "12.6"),
+      |                 ^~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:29:13: note: in definition of macro ‘TEST_ASSERT’
+   29 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c: In function ‘test_cleanup’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_bridge_object.c:226:5: warning: implicit declaration of function ‘bridge_cleanup’; did you mean ‘bridge_read’? [-Wimplicit-function-declaration]
+  226 |     bridge_cleanup();
+      |     ^~~~~~~~~~~~~~
+      |     bridge_read
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:117:5: warning: implicit declaration of function ‘auth_init’ [-Wimplicit-function-declaration]
+  117 |     auth_init(&auth_ctx, "localhost", 3000, "/signalk/v1/stream",
+      |     ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:120:32: error: request for member ‘server_host’ in something not a structure or union
+  120 |     TEST_ASSERT(strcmp(auth_ctx.server_host, "localhost") == 0, "Server host set correctly");
+      |                                ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:121:25: error: request for member ‘server_port’ in something not a structure or union
+  121 |     TEST_ASSERT(auth_ctx.server_port == 3000, "Server port set correctly");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:122:32: error: request for member ‘ws_path’ in something not a structure or union
+  122 |     TEST_ASSERT(strcmp(auth_ctx.ws_path, "/signalk/v1/stream") == 0, "WebSocket path set correctly");
+      |                                ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:123:32: error: request for member ‘client_id’ in something not a structure or union
+  123 |     TEST_ASSERT(strcmp(auth_ctx.client_id, "marine_iot") == 0, "Client ID set correctly");
+      |                                ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:124:32: error: request for member ‘password’ in something not a structure or union
+  124 |     TEST_ASSERT(strcmp(auth_ctx.password, "test_password") == 0, "Password set correctly");
+      |                                ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:125:25: error: request for member ‘authenticated’ in something not a structure or union
+  125 |     TEST_ASSERT(auth_ctx.authenticated == false, "Initial authentication state false");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:126:25: error: request for member ‘token’ in something not a structure or union
+  126 |     TEST_ASSERT(auth_ctx.token == NULL, "Initial token NULL");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:129:5: warning: implicit declaration of function ‘auth_set_token’ [-Wimplicit-function-declaration]
+  129 |     auth_set_token(&auth_ctx, valid_jwt);
+      |     ^~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:130:25: error: request for member ‘token’ in something not a structure or union
+  130 |     TEST_ASSERT(auth_ctx.token != NULL, "Token set successfully");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:131:32: error: request for member ‘token’ in something not a structure or union
+  131 |     TEST_ASSERT(strcmp(auth_ctx.token, valid_jwt) == 0, "Token value correct");
+      |                                ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:132:25: error: request for member ‘authenticated’ in something not a structure or union
+  132 |     TEST_ASSERT(auth_ctx.authenticated == true, "Authentication state updated");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:135:5: warning: implicit declaration of function ‘auth_clear_token’ [-Wimplicit-function-declaration]
+  135 |     auth_clear_token(&auth_ctx);
+      |     ^~~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:136:25: error: request for member ‘token’ in something not a structure or union
+  136 |     TEST_ASSERT(auth_ctx.token == NULL, "Token cleared");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:137:25: error: request for member ‘authenticated’ in something not a structure or union
+  137 |     TEST_ASSERT(auth_ctx.authenticated == false, "Authentication state cleared");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:140:5: warning: implicit declaration of function ‘auth_cleanup’ [-Wimplicit-function-declaration]
+  140 |     auth_cleanup(&auth_ctx);
+      |     ^~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c: In function ‘test_marine_data_messages’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:204:28: warning: implicit declaration of function ‘create_signalk_update’ [-Wimplicit-function-declaration]
+  204 |     cJSON* sensor_update = create_signalk_update("environment.water.temperature", 15.5, "°C");
+      |                            ^~~~~~~~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:204:28: warning: initialization of ‘cJSON *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_ipso_objects.c:21:10: fatal error: object_generic_sensor.h: No such file or directory
+   21 | #include "object_generic_sensor.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:222:27: warning: implicit declaration of function ‘create_signalk_put’ [-Wimplicit-function-declaration]
+  222 |     cJSON* actuator_put = create_signalk_put("electrical.switches.navigation.lights", true);
+      |                           ^~~~~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:222:27: warning: initialization of ‘cJSON *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+make[2]: *** [CMakeFiles/test-ipso-objects.dir/build.make:76: CMakeFiles/test-ipso-objects.dir/test_ipso_objects.c.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:119: CMakeFiles/test-ipso-objects.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c: In function ‘test_connection_state_management’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:295:5: error: unknown type name ‘auth_context_t’
+  295 |     auth_context_t auth_ctx;
+      |     ^~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:300:25: error: request for member ‘connection_state’ in something not a structure or union
+  300 |     TEST_ASSERT(auth_ctx.connection_state == WS_DISCONNECTED, "Initial state disconnected");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:300:46: error: ‘WS_DISCONNECTED’ undeclared (first use in this function)
+  300 |     TEST_ASSERT(auth_ctx.connection_state == WS_DISCONNECTED, "Initial state disconnected");
+      |                                              ^~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:300:46: note: each undeclared identifier is reported only once for each function it appears in
+  300 |     TEST_ASSERT(auth_ctx.connection_state == WS_DISCONNECTED, "Initial state disconnected");
+      |                                              ^~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:303:5: warning: implicit declaration of function ‘set_connection_state’ [-Wimplicit-function-declaration]
+  303 |     set_connection_state(&auth_ctx, WS_CONNECTING);
+      |     ^~~~~~~~~~~~~~~~~~~~
+make[2]: *** [CMakeFiles/test-bridge-object.dir/build.make:76: CMakeFiles/test-bridge-object.dir/test_bridge_object.c.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:93: CMakeFiles/test-bridge-object.dir/all] Error 2
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:303:37: error: ‘WS_CONNECTING’ undeclared (first use in this function)
+  303 |     set_connection_state(&auth_ctx, WS_CONNECTING);
+      |                                     ^~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:304:25: error: request for member ‘connection_state’ in something not a structure or union
+  304 |     TEST_ASSERT(auth_ctx.connection_state == WS_CONNECTING, "State changed to connecting");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:306:37: error: ‘WS_CONNECTED’ undeclared (first use in this function)
+  306 |     set_connection_state(&auth_ctx, WS_CONNECTED);
+      |                                     ^~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:307:25: error: request for member ‘connection_state’ in something not a structure or union
+  307 |     TEST_ASSERT(auth_ctx.connection_state == WS_CONNECTED, "State changed to connected");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:309:37: error: ‘WS_AUTHENTICATED’ undeclared (first use in this function)
+  309 |     set_connection_state(&auth_ctx, WS_AUTHENTICATED);
+      |                                     ^~~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:310:25: error: request for member ‘connection_state’ in something not a structure or union
+  310 |     TEST_ASSERT(auth_ctx.connection_state == WS_AUTHENTICATED, "State changed to authenticated");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:312:37: error: ‘WS_ERROR’ undeclared (first use in this function)
+  312 |     set_connection_state(&auth_ctx, WS_ERROR);
+      |                                     ^~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:313:25: error: request for member ‘connection_state’ in something not a structure or union
+  313 |     TEST_ASSERT(auth_ctx.connection_state == WS_ERROR, "State changed to error");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:316:25: error: request for member ‘connection_state’ in something not a structure or union
+  316 |     TEST_ASSERT(auth_ctx.connection_state == WS_DISCONNECTED, "State changed to disconnected");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:319:13: error: request for member ‘reconnect_count’ in something not a structure or union
+  319 |     auth_ctx.reconnect_count = 0;
+      |             ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:320:29: warning: implicit declaration of function ‘should_attempt_reconnect’ [-Wimplicit-function-declaration]
+  320 |     bool should_reconnect = should_attempt_reconnect(&auth_ctx);
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:323:13: error: request for member ‘reconnect_count’ in something not a structure or union
+  323 |     auth_ctx.reconnect_count = 5;
+      |             ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:327:13: error: request for member ‘reconnect_count’ in something not a structure or union
+  327 |     auth_ctx.reconnect_count = 10;
+      |             ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c: In function ‘test_marine_subscription_management’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:338:27: warning: implicit declaration of function ‘create_subscription_message’ [-Wimplicit-function-declaration]
+  338 |     cJSON* subscription = create_subscription_message();
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:338:27: warning: initialization of ‘cJSON *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c: In function ‘test_error_handling’:
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:381:5: error: unknown type name ‘auth_context_t’
+  381 |     auth_context_t auth_ctx;
+      |     ^~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:385:32: error: request for member ‘server_host’ in something not a structure or union
+  385 |     TEST_ASSERT(strlen(auth_ctx.server_host) == 0 ||
+      |                                ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:386:32: error: request for member ‘server_host’ in something not a structure or union
+  386 |                 strcmp(auth_ctx.server_host, "invalid_host") == 0,
+      |                                ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:390:25: error: request for member ‘server_port’ in something not a structure or union
+  390 |     TEST_ASSERT(auth_ctx.server_port == 0, "Invalid port handled");
+      |                         ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:393:32: error: request for member ‘client_id’ in something not a structure or union
+  393 |     TEST_ASSERT(strlen(auth_ctx.client_id) == 0, "Empty client ID handled");
+      |                                ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:394:32: error: request for member ‘password’ in something not a structure or union
+  394 |     TEST_ASSERT(strlen(auth_ctx.password) == 0, "Empty password handled");
+      |                                ^
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:31:13: note: in definition of macro ‘TEST_ASSERT’
+   31 |         if (condition) { \
+      |             ^~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:397:24: warning: implicit declaration of function ‘create_error_message’ [-Wimplicit-function-declaration]
+  397 |     cJSON* error_msg = create_error_message("Test error", 500);
+      |                        ^~~~~~~~~~~~~~~~~~~~
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_signalk_auth.c:397:24: warning: initialization of ‘cJSON *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+/home/pi/wakaama/examples/signalk-lwm2m-client/websocket_client/test_integration.c:25:10: fatal error: object_generic_sensor.h: No such file or directory
+   25 | #include "object_generic_sensor.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+[  8%] Building C object CMakeFiles/test-integration.dir/home/pi/wakaama/examples/signalk-lwm2m-client/common/bridge_object.c.o
+make[2]: *** [CMakeFiles/test-integration.dir/build.make:76: CMakeFiles/test-integration.dir/test_integration.c.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+[  9%] Building C object CMakeFiles/test-signalk-auth.dir/signalk_ws.c.o
+make[2]: *** [CMakeFiles/test-signalk-auth.dir/build.make:76: CMakeFiles/test-signalk-auth.dir/test_signalk_auth.c.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+[ 11%] Building C object CMakeFiles/test-signalk-auth.dir/home/pi/wakaama/core/liblwm2m.c.o
+make[1]: *** [CMakeFiles/Makefile2:171: CMakeFiles/test-integration.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:145: CMakeFiles/test-signalk-auth.dir/all] Error 2
+make: *** [Makefile:101: all] Error 2
