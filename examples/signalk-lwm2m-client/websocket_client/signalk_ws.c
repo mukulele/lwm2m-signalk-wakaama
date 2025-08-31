@@ -1,3 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    char pattern[64];
+    uint16_t objectId;
+    uint16_t resourceId;
+    char instanceStrategy[16];
+} MappingEntry;
+
+#define MAX_MAPPINGS 16
+MappingEntry mappingTable[MAX_MAPPINGS];
+int mappingCount = 0;
+
+int load_mapping_table(const char *filename) {
+    FILE *f = fopen(filename, "r");
+    if (!f) return -1;
+    fseek(f, 0, SEEK_END);
+    long len = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    char *data = malloc(len + 1);
+    fread(data, 1, len, f);
+    data[len] = 0;
+    fclose(f);
+
+    cJSON *root = cJSON_Parse(data);
+    free(data);
+    if (!root) return -2;
+
+    cJSON *arr = cJSON_GetObjectItem(root, "signalK_to_lwm2m");
+    if (!cJSON_IsArray(arr)) {
+        cJSON_Delete(root);
+        return -3;
+    }
+
+    mappingCount = 0;
+    cJSON *entry;
+    cJSON_ArrayForEach(entry, arr) {
+        if (mappingCount >= MAX_MAPPINGS) break;
+        cJSON *pattern = cJSON_GetObjectItem(entry, "pattern");
+        cJSON *objectId = cJSON_GetObjectItem(entry, "objectId");
+        cJSON *resourceId = cJSON_GetObjectItem(entry, "resourceId");
+        cJSON *instanceStrategy = cJSON_GetObjectItem(entry, "instanceStrategy");
+        if (cJSON_IsString(pattern) && cJSON_IsNumber(objectId) && cJSON_IsNumber(resourceId) && cJSON_IsString(instanceStrategy)) {
+            strncpy(mappingTable[mappingCount].pattern, pattern->valuestring, sizeof(mappingTable[mappingCount].pattern)-1);
+            mappingTable[mappingCount].objectId = (uint16_t)objectId->valuedouble;
+            mappingTable[mappingCount].resourceId = (uint16_t)resourceId->valuedouble;
+            strncpy(mappingTable[mappingCount].instanceStrategy, instanceStrategy->valuestring, sizeof(mappingTable[mappingCount].instanceStrategy)-1);
+            mappingCount++;
+        }
+    }
+    cJSON_Delete(root);
+    return mappingCount;
+}
 #include <libwebsockets.h>
 #include <cjson/cJSON.h>
 #include <string.h>
@@ -156,6 +210,12 @@ static int callback_signalk(struct lws *wsi,
                             enum lws_callback_reasons reason,
                             void *user, void *in, size_t len)
 {
+    static int mapping_initialized = 0;
+    if (!mapping_initialized) {
+        int loaded = load_mapping_table("settings.json");
+        printf("[SignalK] Loaded %d mapping entries from settings.json\n", loaded);
+        mapping_initialized = 1;
+    }
     switch (reason)
     {
     case LWS_CALLBACK_CLIENT_ESTABLISHED:
@@ -247,6 +307,62 @@ static int callback_signalk(struct lws *wsi,
                             if (cJSON_IsString(path) && value)
                             {
                                 char valbuf[64];
+                                // --- Generalized dynamic registration logic ---
+                                // Find mapping entry for this path
+                                MappingEntry *found = NULL;
+                                for (int m = 0; m < mappingCount; m++) {
+                                    // Simple wildcard match: pattern ends with '*' matches prefix
+                                    size_t plen = strlen(mappingTable[m].pattern);
+                                    if (mappingTable[m].pattern[plen-1] == '*') {
+                                        if (strncmp(path->valuestring, mappingTable[m].pattern, plen-1) == 0) {
+                                            found = &mappingTable[m];
+                                            break;
+                                        }
+                                    } else if (strcmp(path->valuestring, mappingTable[m].pattern) == 0) {
+                                        found = &mappingTable[m];
+                                        break;
+                                    }
+                                }
+                                if (!found) {
+                                    printf("[SignalK] No mapping for path: %s\n", path->valuestring);
+                                    return 0;
+                                }
+
+                                // Instance ID extraction (suffix strategy)
+                                uint16_t instId = 0;
+                                if (strcmp(found->instanceStrategy, "suffix") == 0) {
+                                    const char *lastdot = strrchr(path->valuestring, '.');
+                                    if (lastdot && *(lastdot+1)) {
+                                        instId = (uint16_t)atoi(lastdot+1); // fallback: use numeric suffix
+                                    }
+                                }
+
+                                // Check if mapping exists
+                                int mapping_exists = 0;
+                                for (int i = 0; i < registry_count; i++) {
+                                    if (strcmp(registry[i].signalK_path, path->valuestring) == 0) {
+                                        mapping_exists = 1;
+                                        break;
+                                    }
+                                }
+                                if (!mapping_exists) {
+                                    // Create new instance in the correct object
+                                    lwm2m_object_t *obj = NULL;
+                                    extern lwm2m_object_t *energyObj, *genericSensorObj, *locationObj, *powerMeasurementObj;
+                                    switch (found->objectId) {
+                                        case 3331: obj = energyObj; break;
+                                        case 3300: obj = genericSensorObj; break;
+                                        case 3336: obj = powerMeasurementObj; break;
+                                        case 6:    obj = locationObj; break;
+                                        // Add more as needed
+                                    }
+                                    if (obj && obj->createFunc) {
+                                        obj->createFunc(NULL, instId, 0, NULL, obj);
+                                        printf("[SignalK] Created instance %d for object %u, path %s\n", instId, found->objectId, path->valuestring);
+                                    }
+                                    bridge_register(found->objectId, instId, found->resourceId, path->valuestring);
+                                }
+                                // --- End generalized dynamic registration logic ---
 
                                 if (cJSON_IsNumber(value))
                                 {

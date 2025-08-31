@@ -345,23 +345,17 @@ lwm2m_object_t *get_object_location(void) {
         // initialize private data structure containing the needed variables
         if (NULL != locationObj->userData) {
             location_data_t *data = (location_data_t *)locationObj->userData;
-            
-            // Register SignalK bridge mappings for location data
-            bridge_register(LWM2M_LOCATION_OBJECT_ID, 0, RES_M_LATITUDE, "navigation.position.latitude");
-            bridge_register(LWM2M_LOCATION_OBJECT_ID, 0, RES_M_LONGITUDE, "navigation.position.longitude");
-            bridge_register(LWM2M_LOCATION_OBJECT_ID, 0, RES_O_SPEED, "navigation.speedOverGround");
-            bridge_register(LWM2M_LOCATION_OBJECT_ID, 0, RES_O_ALTITUDE, "navigation.gnss.antennaAltitude");
-            
+            // Do not register bridge mappings at startup
+            // Instead, register dynamically when new SignalK data arrives
             // Initialize with default values (will be updated from SignalK)
-            data->latitude = 48.80782;  // Initial position from SignalK sample
-            data->longitude = 9.527745;
-            data->altitude = 273.66;     // From SignalK GNSS antenna altitude
-            data->radius = 10.0;         // 10m GPS accuracy
-            location_setVelocity(locationObj, 0, 0, 255); // 255: speedUncertainty not supported!
+            data->latitude = 0.0;
+            data->longitude = 0.0;
+            data->altitude = 0.0;
+            data->radius = 0.0;
+            location_setVelocity(locationObj, 0, 0, 255);
             data->timestamp = time(NULL);
             data->speed = 0.0;
-            
-            printf("[Location] Initialized with SignalK bridge mappings\n");
+            printf("[Location] Created with no bridge mappings. Mappings will be registered dynamically.\n");
         } else {
             lwm2m_free(locationObj);
             locationObj = NULL;

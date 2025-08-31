@@ -5,6 +5,28 @@
 
 #define MAX_BRIDGE_RESOURCES 128
 
+/***************************************************************************
+Implements a mapping layer between SignalK data paths and LwM2M resources. Its main responsibilities are:
+
+Registry Management:
+Maintains a registry (bridge_resource_t registry[]) of mappings between SignalK JSON paths and LwM2M object/instance/resource IDs.
+
+Registration:
+bridge_register(objId, instId, resId, signalK_path) adds a mapping to the registry, linking a SignalK path to a specific LwM2M resource.
+
+Value Update:
+bridge_update(signalK_path, new_value) updates the cached value for a mapped resource when new data arrives from SignalK. If the resource is observed, it triggers a notification to the LwM2M server.
+
+Value Read:
+bridge_read(objId, instId, resId) retrieves the current cached value for a mapped resource.
+
+Value Write:
+bridge_write(objId, instId, resId, value) updates the cached value for a mapped resource, with a placeholder for forwarding writes back to SignalK.
+
+Thread Safety:
+Uses a mutex (reg_mutex) to protect registry access.
+*********************************************************************************/
+
 static bridge_resource_t registry[MAX_BRIDGE_RESOURCES];
 static int registry_count = 0;
 static pthread_mutex_t reg_mutex = PTHREAD_MUTEX_INITIALIZER;

@@ -1,8 +1,3 @@
-#ifndef OBJECT_ENERGY_H
-#define OBJECT_ENERGY_H
-
-#include "liblwm2m.h"
-
 /**
  * Energy Object (3331)
  * 
@@ -17,6 +12,11 @@
  * 4: Wind generation energy
  * 5: Battery bank energy flow
  */
+#ifndef OBJECT_ENERGY_H
+#define OBJECT_ENERGY_H
+
+#include "liblwm2m.h"
+
 
 lwm2m_object_t * get_energy_object(void);
 void free_energy_object(lwm2m_object_t * objectP);
@@ -33,3 +33,4 @@ void energy_update_value(lwm2m_object_t * objectP, uint16_t instanceId,
                         double cumulativeWh, double currentW, const char* appType);
 
 #endif /* OBJECT_ENERGY_H */
+

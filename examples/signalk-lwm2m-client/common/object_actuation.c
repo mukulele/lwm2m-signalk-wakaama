@@ -458,8 +458,9 @@ lwm2m_object_t * get_actuation_object(void)
         actuationObj->createFunc = prv_create;
         actuationObj->deleteFunc = prv_delete;
 
-        // Initialize predefined instances for marine systems
-        prv_init_instances(actuationObj);
+    // Do not initialize predefined instances at startup
+    // Instances and bridge mappings will be created dynamically when new SignalK data arrives
+    printf("[Actuation] Created with no instances. Instances will be added dynamically.\n");
     }
 
     return actuationObj;

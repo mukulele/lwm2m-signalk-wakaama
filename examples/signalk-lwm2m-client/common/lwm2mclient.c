@@ -810,110 +810,6 @@ void print_usage(void) {
     fprintf(stdout, "  -f FILE\tSpecify path to SignalK settings.json file (enables SignalK WebSocket client)\r\n");
     fprintf(stdout, "\r\n");
 }
-// START wakatiwai
-
-static char * server_get_uri(lwm2m_object_t * obj, uint16_t instanceId) {
-    int size = 1;
-    lwm2m_data_t * dataP = lwm2m_data_new(size);
-    dataP->id = 0; // security server uri
-    char * uriBuffer;
-
-    obj->readFunc(NULL, instanceId, &size, &dataP, obj);
-    if (dataP != NULL &&
-            (dataP->type == LWM2M_TYPE_STRING || dataP->type == LWM2M_TYPE_OPAQUE) &&
-            dataP->value.asBuffer.length > 0) {
-        uriBuffer = lwm2m_malloc(dataP->value.asBuffer.length + 1);
-        memset(uriBuffer, 0, dataP->value.asBuffer.length + 1);
-        strncpy(uriBuffer, (const char *) dataP->value.asBuffer.buffer, dataP->value.asBuffer.length);
-        lwm2m_data_free(size, dataP);
-        return uriBuffer;
-    }
-    lwm2m_data_free(size, dataP);
-    return NULL;
-
-}
-
-static uint16_t object_id_contains(uint16_t objectId, uint16_t * objectIdArray, uint16_t len) {
-    uint16_t result = 0;
-    uint16_t i = 0;
-    if (objectId < 1 || objectIdArray == NULL || len < 1) {
-        return result;
-    }
-    for (; i < len; i++) {
-        if (objectIdArray[i] == objectId) {
-            result = 1;
-            break;
-        }
-    }
-    return result;
-}
-
-static uint16_t * parse_object_id_csv(const char * objectIdCsv, uint16_t * objCount) {
-    uint16_t count = 1;
-    uint16_t buffIdx = 0;
-    uint16_t objectId = 0;
-    uint16_t objectIndex = 0;
-    uint16_t * objectIdArray;
-    char buff[12];
-    const char * c = objectIdCsv;
-    for (; *c != '\0'; c++) {
-        if (*c == ',') {
-            ++count;
-        }
-    }
-    c = objectIdCsv;
-    objectIdArray = lwm2m_malloc(sizeof(uint16_t) * count);
-    memset(objectIdArray, 0, sizeof(uint16_t) * count);
-    for (; *c != '\0'; c++) {
-        if (*c == ',') {
-            if (buffIdx > 11) {
-                fprintf(stderr, "Too long Object ID\r\n");
-                lwm2m_free(objectIdArray);
-                return NULL;
-            }
-            buff[buffIdx] = '\0';
-            objectId = strtol(buff, NULL, 10);
-            if (object_id_contains(objectId, objectIdArray, objectIndex)) {
-                // duplicate object ID, ignored.
-            } else  if (objectId > 3) {
-                objectIdArray[objectIndex++] = objectId;
-            } else {
-                fprintf(stderr, "Invalid Object ID\r\n");
-                lwm2m_free(objectIdArray);
-                return NULL;
-            }
-            buffIdx = 0;
-        } else {
-            buff[buffIdx++] = *c;
-        }
-    }
-    if (buffIdx > 11) {
-        fprintf(stderr, "Too long Object ID\r\n");
-        lwm2m_free(objectIdArray);
-        return NULL;
-    } else if (buffIdx > 0) {
-        buff[buffIdx] = '\0';
-        objectId = strtol(buff, NULL, 10);
-        if (objectId > 3) {
-            objectIdArray[objectIndex++] = objectId;
-        } else {
-            fprintf(stderr, "Invalid Object ID\r\n");
-            lwm2m_free(objectIdArray);
-            return NULL;
-        }
-    }
-    *objCount = objectIndex;
-#ifdef WITH_LOGS
-    uint16_t i = 0;
-    for (; i < objectIndex; i++) {
-      fprintf(stderr, ">>> %hu => ObjectID:[%hu] \r\n", i, objectIdArray[i]);
-    }
-    // 4 objects(/0,/1,/2,/3) are implicitly included
-    fprintf(stderr, ">>> %hu objects will be deployed as well as predfined 4 objects\r\n", *objCount);
-#endif
-    return objectIdArray;
-}
-// END wakatiwai
 
 int main(int argc, char *argv[]) {
     client_data_t data;
@@ -1224,26 +1120,6 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    // Connectivity statistics object removed due to crashes
-
-    // Note: Access control object removed to keep OBJ_COUNT at 8
-    /*
-    int instId = 0;
-    objArray[7] = acc_ctrl_create_object();
-    if (NULL == objArray[7]) {
-        fprintf(stderr, "Failed to create Access Control object\r\n");
-        return -1;
-    } else if (acc_ctrl_obj_add_inst(objArray[7], instId, 3, 0, serverId) == false) {
-        fprintf(stderr, "Failed to create Access Control object instance\r\n");
-        return -1;
-    } else if (acc_ctrl_oi_add_ac_val(objArray[7], instId, 0, 0xF) == false) {
-        fprintf(stderr, "Failed to create Access Control ACL default resource\r\n");
-        return -1;
-    } else if (acc_ctrl_oi_add_ac_val(objArray[7], instId, 999, 0x1) == false) {
-        fprintf(stderr, "Failed to create Access Control ACL resource for serverId: 999\r\n");
-        return -1;
-    }
-    */
     /*
      * The liblwm2m library is now initialized with the functions that will be in
      * charge of communication

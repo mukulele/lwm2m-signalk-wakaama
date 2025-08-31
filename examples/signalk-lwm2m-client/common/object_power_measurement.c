@@ -343,13 +343,7 @@ lwm2m_object_t * get_power_measurement_object(void)
         targetP->timestamp = time(NULL);
         powerObj->instanceList = LWM2M_LIST_ADD(powerObj->instanceList, targetP);
 
-        printf("[Power Measurement] Initialized with marine electrical monitoring instances\n");
-
-        // Register SignalK bridge mappings for electrical system
-        bridge_register(3305, 0, 5700, "electrical.batteries.house.voltage");
-        bridge_register(3305, 1, 5700, "electrical.batteries.engine.voltage");
-        bridge_register(3305, 2, 5700, "electrical.batteries.house.current");
-        bridge_register(3305, 10, 5700, "electrical.solar.panelsPower");
+    printf("[Power Measurement] Created with no bridge mappings. Mappings will be registered dynamically.\n");
     }
 
     return powerObj;

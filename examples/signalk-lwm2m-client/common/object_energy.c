@@ -80,10 +80,9 @@ static uint8_t prv_read(lwm2m_context_t * contextP,
         (*dataArrayP)[6].id = 5810; // Reset (placeholder for discovery)
     }
 
-    for (i = 0 ; i < *numDataP ; i++)
-    {
-        switch ((*dataArrayP)[i].id)
-        {
+
+    for (i = 0 ; i < *numDataP ; i++) {
+        switch ((*dataArrayP)[i].id) {
         case 5805: // Cumulative Energy
             lwm2m_data_encode_float(targetP->cumulativeEnergy, *dataArrayP + i);
             break;
@@ -108,10 +107,8 @@ static uint8_t prv_read(lwm2m_context_t * contextP,
             return COAP_404_NOT_FOUND;
         }
     }
-
     return COAP_205_CONTENT;
 }
-
 static uint8_t prv_write(lwm2m_context_t * contextP,
                         uint16_t instanceId,
                         int numData,
@@ -121,29 +118,21 @@ static uint8_t prv_write(lwm2m_context_t * contextP,
 {
     energy_instance_t * targetP;
     int i;
-
     targetP = (energy_instance_t *)lwm2m_list_find(objectP->instanceList, instanceId);
     if (NULL == targetP) return COAP_404_NOT_FOUND;
-
-    for (i = 0 ; i < numData ; i++)
-    {
-        switch (dataArray[i].id)
-        {
+    for (i = 0 ; i < numData ; i++) {
+        switch (dataArray[i].id) {
         case 5822: // Measurement Period
-            if (lwm2m_data_decode_int(dataArray + i, (int64_t*)&targetP->measurementPeriod) == 1)
-            {
+            if (lwm2m_data_decode_int(dataArray + i, (int64_t*)&targetP->measurementPeriod) == 1) {
                 targetP->timestamp = time(NULL);
-                return COAP_204_CHANGED;
-            }
-            else
-            {
+            } else {
                 return COAP_400_BAD_REQUEST;
             }
+            break;
         default:
             return COAP_405_METHOD_NOT_ALLOWED;
         }
     }
-
     return COAP_204_CHANGED;
 }
 
@@ -155,18 +144,14 @@ static uint8_t prv_execute(lwm2m_context_t * contextP,
                           lwm2m_object_t * objectP)
 {
     energy_instance_t * targetP;
-
     targetP = (energy_instance_t *)lwm2m_list_find(objectP->instanceList, instanceId);
     if (NULL == targetP) return COAP_404_NOT_FOUND;
-
-    switch (resourceId)
-    {
+    switch (resourceId) {
     case 5810: // Reset Cumulative Energy
         targetP->cumulativeEnergy = 0.0;
         targetP->lastReset = time(NULL);
         targetP->timestamp = targetP->lastReset;
-        printf("[Energy] Reset cumulative energy for instance %d (%s)\n", 
-               instanceId, targetP->applicationType);
+        printf("[Energy] Reset cumulative energy for instance %d (%s)\n", instanceId, targetP->applicationType);
         return COAP_204_CHANGED;
     default:
         return COAP_405_METHOD_NOT_ALLOWED;
@@ -180,19 +165,15 @@ static uint8_t prv_create(lwm2m_context_t * contextP,
                          lwm2m_object_t * objectP)
 {
     energy_instance_t * targetP;
-
     targetP = (energy_instance_t *)lwm2m_malloc(sizeof(energy_instance_t));
     if (NULL == targetP) return COAP_500_INTERNAL_SERVER_ERROR;
     memset(targetP, 0, sizeof(energy_instance_t));
-
     targetP->shortID = instanceId;
     targetP->measurementPeriod = 60; // Default 1 minute
     targetP->powerFactor = 1.0;      // Default unity power factor
     targetP->timestamp = time(NULL);
     targetP->lastReset = targetP->timestamp;
-
     objectP->instanceList = LWM2M_LIST_ADD(objectP->instanceList, targetP);
-
     return COAP_201_CREATED;
 }
 
@@ -201,13 +182,12 @@ static uint8_t prv_delete(lwm2m_context_t * contextP,
                          lwm2m_object_t * objectP)
 {
     energy_instance_t * targetP;
-
     objectP->instanceList = lwm2m_list_remove(objectP->instanceList, instanceId, (lwm2m_list_t **)&targetP);
     if (NULL == targetP) return COAP_404_NOT_FOUND;
-
     lwm2m_free(targetP);
     return COAP_202_DELETED;
 }
+
 
 // Helper function to update energy values from SignalK
 void energy_update_value(lwm2m_object_t * objectP, uint16_t instanceId, 
@@ -226,96 +206,21 @@ void energy_update_value(lwm2m_object_t * objectP, uint16_t instanceId,
 
 lwm2m_object_t * get_energy_object(void)
 {
-    lwm2m_object_t * energyObj;
-
-    energyObj = (lwm2m_object_t *)lwm2m_malloc(sizeof(lwm2m_object_t));
-
-    if (NULL != energyObj)
-    {
-        energy_instance_t * targetP;
-
-        memset(energyObj, 0, sizeof(lwm2m_object_t));
-
-        energyObj->objID = 3331;
-        energyObj->readFunc = prv_read;
-        energyObj->writeFunc = prv_write;
-        energyObj->createFunc = prv_create;
-        energyObj->deleteFunc = prv_delete;
-        energyObj->executeFunc = prv_execute;
-
-        // Create initial instances for marine energy monitoring
-
-        // Instance 0: Solar Generation Energy
-        targetP = (energy_instance_t *)lwm2m_malloc(sizeof(energy_instance_t));
-        if (NULL == targetP) goto error;
-        memset(targetP, 0, sizeof(energy_instance_t));
-        targetP->shortID = 0;
-        targetP->cumulativeEnergy = 1250.0; // 1.25 kWh daily
-        targetP->currentPower = 85.0;        // 85W current
-        targetP->powerFactor = 1.0;          // DC system
-        targetP->measurementPeriod = 300;    // 5 minutes
-        strcpy(targetP->applicationType, "Solar Generation");
-        targetP->timestamp = time(NULL);
-        targetP->lastReset = targetP->timestamp - (24 * 3600); // Reset daily
-        energyObj->instanceList = LWM2M_LIST_ADD(energyObj->instanceList, targetP);
-
-        // Instance 1: Shore Power Consumption
-        targetP = (energy_instance_t *)lwm2m_malloc(sizeof(energy_instance_t));
-        if (NULL == targetP) goto error;
-        memset(targetP, 0, sizeof(energy_instance_t));
-        targetP->shortID = 1;
-        targetP->cumulativeEnergy = 0.0;     // Not connected
-        targetP->currentPower = 0.0;
-        targetP->powerFactor = 0.95;         // AC system
-        targetP->measurementPeriod = 60;     // 1 minute
-        strcpy(targetP->applicationType, "Shore Power Consumption");
-        targetP->timestamp = time(NULL);
-        targetP->lastReset = targetP->timestamp;
-        energyObj->instanceList = LWM2M_LIST_ADD(energyObj->instanceList, targetP);
-
-        // Instance 2: House Load Consumption
-        targetP = (energy_instance_t *)lwm2m_malloc(sizeof(energy_instance_t));
-        if (NULL == targetP) goto error;
-        memset(targetP, 0, sizeof(energy_instance_t));
-        targetP->shortID = 2;
-        targetP->cumulativeEnergy = 450.0;   // Daily house consumption
-        targetP->currentPower = 65.0;        // Current house load
-        targetP->powerFactor = 0.9;          // Mixed AC/DC loads
-        targetP->measurementPeriod = 60;     // 1 minute
-        strcpy(targetP->applicationType, "House Load Consumption");
-        targetP->timestamp = time(NULL);
-        targetP->lastReset = targetP->timestamp - (24 * 3600);
-        energyObj->instanceList = LWM2M_LIST_ADD(energyObj->instanceList, targetP);
-
-        // Instance 3: Engine Charging Energy
-        targetP = (energy_instance_t *)lwm2m_malloc(sizeof(energy_instance_t));
-        if (NULL == targetP) goto error;
-        memset(targetP, 0, sizeof(energy_instance_t));
-        targetP->shortID = 3;
-        targetP->cumulativeEnergy = 0.0;     // Engine not running
-        targetP->currentPower = 0.0;
-        targetP->powerFactor = 1.0;          // DC charging
-        targetP->measurementPeriod = 60;
-        strcpy(targetP->applicationType, "Engine Alternator Charging");
-        targetP->timestamp = time(NULL);
-        targetP->lastReset = targetP->timestamp;
-        energyObj->instanceList = LWM2M_LIST_ADD(energyObj->instanceList, targetP);
-
-        printf("[Energy] Initialized with marine energy tracking instances\n");
-
-        // Register SignalK bridge mappings for energy tracking
-        bridge_register(3331, 0, 5805, "electrical.solar.cumulativeEnergy");
-        bridge_register(3331, 0, 5800, "electrical.solar.panelsPower");
-        bridge_register(3331, 2, 5805, "electrical.loads.total.cumulativeEnergy");
-        bridge_register(3331, 2, 5800, "electrical.loads.total.power");
-    }
-
+    lwm2m_object_t * energyObj = (lwm2m_object_t *)lwm2m_malloc(sizeof(lwm2m_object_t));
+    if (!energyObj) return NULL;
+    memset(energyObj, 0, sizeof(lwm2m_object_t));
+    energyObj->objID = 3331;
+    energyObj->instanceList = NULL; // No instances at startup
+    energyObj->readFunc     = prv_read;
+    energyObj->writeFunc    = prv_write;
+    energyObj->createFunc   = prv_create;
+    energyObj->deleteFunc   = prv_delete;
+    energyObj->executeFunc  = prv_execute;
+    printf("[Energy] Created with no instances. Instances will be added dynamically.\n");
     return energyObj;
-
-error:
-    lwm2m_free(energyObj);
-    return NULL;
 }
+// Dynamically create and register a new energy instance
+// No custom dynamic registration helper needed. Use standard LwM2M create/delete and value update.
 
 void free_energy_object(lwm2m_object_t * objectP)
 {

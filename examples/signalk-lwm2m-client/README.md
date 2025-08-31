@@ -12,13 +12,6 @@ A production-ready bridge connecting SignalK marine data networks to OMA LwM2M I
 
 ### Implemented LwM2M Objects
 
-| Object | ID | Instances | Purpose | Marine Use Cases |
-|--------|----|-----------|---------| ----------------|
-| Location | 6 | 1 | Position & Navigation | GPS coordinates, speed, altitude |
-| Generic Sensor | 3300 | 1 | Environmental Data | Temperature monitoring |
-| Power Measurement | 3305 | 4 | Electrical Monitoring | Battery voltage/current, solar power |
-| Actuation | 3306 | 6 | Switch Control | Navigation lights, pumps, windlass |
-| Energy | 3331 | 4 | Energy Tracking | Solar generation, consumption analysis |
 
 ### Bridge Registry System
 - **128 Mapping Capacity**: Expandable SignalK path to LwM2M resource mappings
@@ -143,11 +136,6 @@ WRITE /3306/2/5850 → false  # Turn off bilge pump
 
 ## 🔍 Monitoring
 
-### Real-time Data Streams
-- **Navigation**: Position, speed, heading updates every 2 seconds
-- **Electrical**: Battery voltage/current monitoring every 5 seconds  
-- **Energy**: Cumulative consumption/generation every 30 seconds
-- **Switches**: Real-time state changes and control confirmations
 
 ### Debugging
 ```bash
@@ -174,33 +162,8 @@ tcpdump -i any port 5683
 2. Add bridge registrations in object initialization
 3. Increase `MAX_BRIDGE_RESOURCES` if needed (currently 128)
 
-## 📊 Performance
 
-- **Memory Usage**: ~2.5MB baseline + 128 mappings
-- **CPU Utilization**: 2-5% on Raspberry Pi 4
-- **Network Efficiency**: 80% bandwidth reduction vs. full subscription
-- **Response Time**: <50ms SignalK to LwM2M latency
 
-## 🔒 Security
-
-- **Transport Security**: DTLS support available
-- **Access Control**: LwM2M ACL object implementation
-- **Command Validation**: Input sanitization and bounds checking
-- **Audit Trail**: Comprehensive logging of all control operations
-
-## 📚 Documentation
-
-- [Development Roadmap](examples/signalk-lwm2m-client/ROADMAP.md) - Feature implementation timeline
-- [Architecture Details](docs/architecture.md) - Technical deep dive
-- [API Reference](docs/api.md) - LwM2M object specifications
-- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Submit a pull request
 
 ## 📄 License
 
@@ -214,5 +177,3 @@ This project is licensed under the Eclipse Public License v2.0 - see the [LICENS
 - Marine IoT community for use case guidance
 
 ---
-
-**Production Ready** • **OMA Compliant** • **Marine Focused** • **Open Source**
