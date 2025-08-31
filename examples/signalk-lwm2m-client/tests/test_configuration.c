@@ -5,6 +5,8 @@
 
 #include "test_framework.h"
 
+extern test_config_t g_test_config;
+
 static int setup_configuration_tests(void) { return 0; }
 static int teardown_configuration_tests(void) { return 0; }
 

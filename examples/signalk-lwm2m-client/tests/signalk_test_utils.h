@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdint.h>
 
 /* ============================================================================
  * SignalK Test Constants

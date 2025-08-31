@@ -1,0 +1,43 @@
+TODO: Review and consolidate possible duplicate test files
+
+Bridge Object Tests:
+- test_bridge_objects.c (main suite, professional CUnit-based)
+- test_bridge_object.c
+- test_bridge_object_cunit.c
+- test_bridge_object_runner.c
+- test_bridge_simple.c
+- bridge_object_tests.c
+- bridge_object_tests_new.c
+
+WebSocket Tests:
+- test_websocket_cunit.c
+- test_websocket_runner.c
+- test_websocket_simple.c
+
+SignalK Tests:
+- test_signalk_connection.c (main suite)
+- test_signalk_auth.c
+- test_signalk_control.c
+
+Marine/Sensor Tests:
+- test_marine_sensors.c
+- marine_bridge_tests.c
+- marine_test_utils.c
+
+Reconnection Tests:
+- test_reconnection.c
+- test_reconnect.c
+
+Other:
+- test_basic.c
+- test_error_handling.c
+- test_integration.c
+- test_ipso_objects.c
+- test_json_config.c
+- test_subscriptions.c
+- run_tests.sh (script)
+
+Recommendation:
+- Review the contents and purpose of each similarly named file.
+- Consolidate or remove duplicates as needed, keeping only the most complete or up-to-date versions.
+- If you want a more detailed comparison or want to know which files are most likely redundant, let me know!

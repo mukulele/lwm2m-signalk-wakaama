@@ -4,6 +4,9 @@
  */
 
 #include "test_framework.h"
+#include <unistd.h>
+
+extern test_config_t g_test_config;
 
 static int setup_reconnection_tests(void) { return 0; }
 static int teardown_reconnection_tests(void) { return 0; }

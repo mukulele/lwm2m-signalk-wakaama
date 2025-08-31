@@ -69,9 +69,7 @@ bool test_validate_lwm2m_object(lwm2m_object_t* object, uint16_t expected_obj_id
 void test_simulate_network_conditions(bool simulate_disconnect);
 
 /* Performance benchmarking */
-void test_benchmark_start(test_benchmark_t* benchmark, const char* operation_name);
-void test_benchmark_end(test_benchmark_t* benchmark);
-void test_benchmark_print(const test_benchmark_t* benchmark);
+// ...existing code...
 
 /* Test condition waiting */
 bool test_wait_for_condition(bool (*condition)(void), int timeout_sec);

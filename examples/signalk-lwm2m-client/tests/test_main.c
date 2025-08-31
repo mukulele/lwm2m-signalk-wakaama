@@ -17,7 +17,7 @@
  * Global Test Configuration
  * ============================================================================ */
 
-static test_config_t g_test_config = {
+test_config_t g_test_config = {
     .suite = TEST_SUITE_ALL,
     .verbose = false,
     .xml_output = false,
@@ -249,7 +249,8 @@ CU_ErrorCode test_framework_run_suite(test_suite_t suite, test_results_t* result
     CU_ErrorCode run_result;
     if (g_test_config.xml_output) {
         CU_set_output_filename(g_test_config.output_file);
-        run_result = CU_automated_run_tests();
+        CU_automated_run_tests();
+        run_result = CUE_SUCCESS;
     } else if (g_test_config.verbose) {
         CU_basic_set_mode(CU_BRM_VERBOSE);
         run_result = CU_basic_run_tests();

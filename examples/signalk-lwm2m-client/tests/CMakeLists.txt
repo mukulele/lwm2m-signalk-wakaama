@@ -90,7 +90,6 @@ set(RELEASE_FLAGS
 
 set(TEST_SOURCES
     test_main.c
-    test_signalk_connection.c
     test_bridge_objects.c
     test_marine_sensors.c
     test_reconnection.c
@@ -113,12 +112,88 @@ set(MOCK_SOURCES
 
 # ################################################################################
 # Test Executable
+# Add a separate executable for Bridge Object tests
+add_executable(test_bridge_objects
+    test_framework.h
+    ${MOCK_SOURCES}
+)
+
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/mocks
+    ${WAKAAMA_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../udp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../websocket_client
+    ${CUNIT_INCLUDE_DIRS}
+)
+target_compile_options(test_bridge_objects PRIVATE
+    ${WARNING_FLAGS}
+    $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
+    $<$<CONFIG:Release>:${RELEASE_FLAGS}>
+    ${CUNIT_CFLAGS_OTHER}
+
+target_link_libraries(test_bridge_objects PRIVATE
+    ${CUNIT_LIBRARIES}
+)
+
+target_link_directories(test_bridge_objects PRIVATE
+)
 # ################################################################################
 
+    ${TEST_SOURCES}
+    ${MOCK_SOURCES}
+)
+
+add_executable(test_signalk_connection
+    test_signalk_connection.c
+    test_framework.h
+    ${MOCK_SOURCES}
+)
+
+target_include_directories(test_signalk_connection PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/mocks
+    ${WAKAAMA_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../udp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../websocket_client
+    ${CUNIT_INCLUDE_DIRS}
+
+target_compile_options(test_signalk_connection PRIVATE
+    ${WARNING_FLAGS}
+    $<$<CONFIG:Release>:${RELEASE_FLAGS}>
+    ${CUNIT_CFLAGS_OTHER}
+)
+    ${CUNIT_LIBRARIES}
+    m
+)
+    ${CUNIT_LIBRARY_DIRS}
+)
+
+# Enable sanitizers if requested
+option(ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" ON)
+if(ENABLE_SANITIZERS)
+    set(SANITIZER_FLAGS -fsanitize=address -fsanitize=undefined)
+    target_link_options(signalk_lwm2m_tests PRIVATE ${SANITIZER_FLAGS})
+endif()
+
+target_include_directories(signalk_lwm2m_tests PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${WAKAAMA_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../udp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../websocket_client
+)
+
+
+# Single test runner approach: all test sources in one executable
 add_executable(signalk_lwm2m_tests
     ${TEST_SOURCES}
     ${MOCK_SOURCES}
 )
+
+option(ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" ON)
+if(ENABLE_SANITIZERS)
+    set(SANITIZER_FLAGS -fsanitize=address -fsanitize=undefined)
+    target_compile_options(signalk_lwm2m_tests PRIVATE ${SANITIZER_FLAGS})
+    target_link_options(signalk_lwm2m_tests PRIVATE ${SANITIZER_FLAGS})
+endif()
 
 target_include_directories(signalk_lwm2m_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -144,9 +219,36 @@ target_link_libraries(signalk_lwm2m_tests PRIVATE
 target_link_directories(signalk_lwm2m_tests PRIVATE
     ${CUNIT_LIBRARY_DIRS}
 )
+target_compile_options(signalk_lwm2m_tests PRIVATE
+    ${WARNING_FLAGS}
+    $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
+    $<$<CONFIG:Release>:${RELEASE_FLAGS}>
+    ${CUNIT_CFLAGS_OTHER}
+)
+
+target_link_libraries(signalk_lwm2m_tests PRIVATE
+    ${CUNIT_LIBRARIES}
+    m  # Math library
+)
+
+target_link_directories(signalk_lwm2m_tests PRIVATE
+    ${CUNIT_LIBRARY_DIRS}
+)
 
 # ################################################################################
 # Test Registration
+# Register the new Bridge Object test executable
+add_test(
+    NAME test_bridge_objects
+    COMMAND test_bridge_objects --verbose
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+# Register the new SignalK connection test executable
+add_test(
+    NAME test_signalk_connection
+    COMMAND test_signalk_connection --verbose
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
 # ################################################################################
 
 # Main test suite

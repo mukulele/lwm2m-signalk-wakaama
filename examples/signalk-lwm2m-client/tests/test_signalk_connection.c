@@ -10,6 +10,9 @@
  */
 
 #include "test_framework.h"
+#include <unistd.h>
+
+extern test_config_t g_test_config;
 
 /* ============================================================================
  * Test Suite Setup and Teardown

@@ -1,3 +1,27 @@
+// Minimal CUnit test runner main()
+#include <CUnit/Basic.h>
+
+int main(int argc, char* argv[])
+{
+    CU_ErrorCode result = CU_initialize_registry();
+    if (result != CUE_SUCCESS) {
+        fprintf(stderr, "Failed to initialize CUnit registry: %s\n", CU_get_error_msg());
+        return 1;
+    }
+
+    result = register_bridge_object_tests();
+    if (result != CUE_SUCCESS) {
+        fprintf(stderr, "Failed to register bridge object tests: %s\n", CU_get_error_msg());
+        CU_cleanup_registry();
+        return 2;
+    }
+
+    CU_basic_set_mode(CU_BRM_VERBOSE);
+    result = CU_basic_run_tests();
+
+    CU_cleanup_registry();
+    return (result == CUE_SUCCESS) ? 0 : 3;
+}
 /**
  * @file test_bridge_objects.c
  * @brief LwM2M Bridge Object Test Suite
@@ -10,6 +34,8 @@
  */
 
 #include "test_framework.h"
+
+extern test_config_t g_test_config;
 
 /* ============================================================================
  * Test Suite Setup and Teardown

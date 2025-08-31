@@ -5,6 +5,8 @@
 
 #include "test_framework.h"
 
+extern test_config_t g_test_config;
+
 static int setup_marine_sensor_tests(void) { return 0; }
 static int teardown_marine_sensor_tests(void) { return 0; }
 

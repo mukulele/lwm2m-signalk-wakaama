@@ -9,6 +9,9 @@
  */
 
 #include "../marine_test_mocks.h"
+#include <stdint.h>
+#include <unistd.h>
+#include "../test_framework.h"
 #include <sys/time.h>
 #include <pthread.h>
 
